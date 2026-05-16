@@ -160,3 +160,67 @@ class Project(BaseModel):
 - npm работает медленнее pnpm на крупных монорепо, но для нашего размера разница незаметна
 - В любой момент можно переключиться на pnpm одной командой (`npm install -g pnpm` + `pnpm import`)
 - В Sprint 1+ при желании поднимем `pnpm` (надо будет добавить `pnpm-lock.yaml`)
+
+---
+
+## ADR-007: Vertical Slice верифицирован end-to-end
+
+**Дата:** 2026-05-16
+**Статус:** accepted
+
+**Контекст:**
+Sprint 0 SPRINT_0_REPORT.md помечал D11 (vertical slice TS↔Rust↔Python) как `⚠ partial` — код написан, но `cargo build` / `npm install` / `npm run tauri dev` ни разу не запускались. Это был наибольший риск Sprint 0.
+
+В ходе разблокировки запуска возникло **5 разовых блокеров**, каждый из которых пофикшен и закоммичен в `main`:
+
+| # | Блокер | Commit с фиксом |
+|---|---|---|
+| 1 | VS 2022 Community сломана (`vswhere` возвращал `[]`) — продукт не зарегистрирован | (внешняя установка Build Tools 2022) |
+| 2 | `link.exe` не в системном PATH (MSVC tools не добавляются автоматически) | `572fa93` — `scripts/msvc-env.ps1` через `VsDevCmd.bat` |
+| 3 | Tauri 2 требует existence-check для `externalBin` даже в dev mode | `0d911c0` — `scripts/ensure-sidecar-placeholder.ps1` |
+| 4 | Em-dashes (`—`) в .ps1 ломают парсер PowerShell 5.1 на русской Windows (CP-1251) | `2527478` — все скрипты pure ASCII |
+| 5 | `icons/icon.ico` отсутствует — `tauri-build` падает | `e8ae39c` — минимальный 16x16 placeholder |
+| 6 | Rust `tokio::timeout` tuple — `Some(status)` вместо `Ok(status)` | `768715c` |
+| 7 | Tauri 2 требует `src-tauri/capabilities/default.json` для `dialog`/`fs` plugins (file picker не открывался) | `af941bc` |
+| 8 | `Command::new("python")` брал system Python без `konvey_backend` (зависание парсинга XSD) | `16b67f5` — использовать `$env:KONVEY_SIDECAR_PYTHON` |
+
+**Результат после фиксов:**
+- `.\scripts\dev.ps1` запускает окно Konvey за ~1 минуту (первая сборка cargo)
+- Project Picker → Wizard (4 шага) → Workspace с тремя деревьями работает
+- Парсинг **реального** `EnterpriseData_1_8_6.xsd` (920 KB, 737 типов) через TS → Rust JSON-RPC → Python lxml → возврат в TS — **подтверждено визуально на скриншотах владельца**
+- Парсинг 1C XML configuration dump → Pydantic → UI tree — подтверждено визуально
+- Project persists в `%APPDATA%\Konvey\Projects\<uuid>.json` — подтверждено перезапуском приложения
+- Python sidecar lifecycle (spawn at start, graceful shutdown via `stdin.shutdown()`) — работает
+- File picker (нативный Windows dialog) через Tauri 2 dialog plugin — работает
+
+**Решение:**
+D11 Sprint 0 переводится из `⚠ partial` в `✓ done`. ADR-001 (стек Tauri 2 + React/TS + Python sidecar) **подтверждён работоспособностью**, fallback на PyWebView из ADR-001 «Последствия» больше не рассматривается.
+
+**Последствия:**
+- Sprint 1 Phase A.2 (запуск tauri dev) — уже сделано, в Sprint 1 plan можно сократить
+- Все 8 разовых блокеров задокументированы в SPRINT_0_REPORT.md для будущих разработчиков
+- `scripts/setup.ps1` уже есть; в Sprint 1 переименовать в `check-env.ps1` и расширить под требования Opus (Q9)
+
+---
+
+## ADR-008: EnterpriseData extensions (`ext1:*` namespace) — отложено в Sprint 2+
+
+**Дата:** 2026-05-16
+**Статус:** accepted
+
+**Контекст:**
+Получены официальные документы 1С по расширению формата EnterpriseData (`examples/enterprise_data_docs/04_Rasshirenie_formata_obmena.pdf`). Полное описание механизма — в [REFERENCE_EXT.md](REFERENCE_EXT.md).
+
+Расширения нужны для добавления полей в типовые обмены (1С:ERP, УТ, БП) **без снятия конфигурации с поддержки**. На выходе в XML маркируются как `<ext1:ИмяСвойства>...</ext1:ИмяСвойства>`.
+
+**Решение:**
+1. **Sprint 1:** не реализуем расширения, но в модели данных закладываем поля для namespace-aware маппинга:
+   - `XsdField.namespace: str | None = None`
+   - `FieldMapping.ed_namespace: str | None = None`
+2. **Sprint 2:** парсер XSD читает `xs:import`, строит граф пакетов, поддерживает multi-namespace схему. UI отображает расширения с префиксом `ext1:` и иконкой.
+3. **Sprint 3:** BSL генератор поддерживает `ИнициализироватьРасширениеПравилаКонвертацииОбъекта` + `ПространствоИмен` параметр в `ДобавитьПКС`.
+
+**Последствия:**
+- В Sprint 1 модель Project уже готова к расширениям (миграции не понадобятся в Sprint 2)
+- Если в Sprint 1 пользователь попробует загрузить XSD-пакет-расширение — парсер не упадёт, просто проигнорирует `xs:import` и отобразит только содержимое корневого XSD
+- ExchangeMessage.xsd (базовая wrapper-схема для всех EnterpriseData пакетов) сохранён в `examples/enterprise_data_docs/` — используется как reference для генерации sample XML обменного сообщения в Sprint 1.5+

@@ -8,13 +8,24 @@
 
 ## TL;DR
 
-Sprint 0 завершён. Создан рабочий скелет проекта по структуре, описанной в архитектурном промпте. Все ключевые компоненты заложены: документация, Python backend с парсерами XSD/Configuration, Tauri/Rust shell с sidecar IPC, React/TypeScript frontend (Project Picker → Wizard → Workspace), build-скрипты.
+Sprint 0 завершён, **vertical slice верифицирован end-to-end на машине владельца**.
 
-**Python backend полностью функционален и протестирован:** 30/30 pytest-тестов проходят, включая интеграционный smoke-test против реального XSD EnterpriseData 1.8.6 (920 KB).
+- Окно Konvey запускается (Tauri 2 + WebView2), три-панельный Workspace отрисован
+- Wizard 4 шагов прошёл: загрузка реального `EnterpriseData_1_8_6.xsd` (920 KB) → парсинг через TS→Rust→Python с возвратом в UI → выбор папки конфигурации → создание проекта → отображение деревьев
+- Project persists в `%APPDATA%\Konvey\Projects\<uuid>.json`, перезапуск восстанавливает состояние
+- File picker (нативный Windows dialog) через Tauri 2 dialog plugin работает
+- 30/30 pytest-тестов проходят, включая smoke на real XSD
 
-**Tauri shell и React frontend созданы как код**, но **не собраны/не запущены** в этой сессии — у меня нет Cargo toolchain и npm install займёт минуты на стороне владельца. См. раздел «Чек-лист 17 пунктов» — пункты 1-10 явно помечены как требующие верификации владельцем.
+**Цена закрытия Sprint 0 в реальности:** 8 разовых инфраструктурных блокеров (VS Build Tools, MSVC env, capabilities, em-dashes в .ps1, icon.ico, sidecar python, Rust opcode). Все задокументированы в ADR-007.
 
 **Имя проекта:** **Konvey** (ADR-005). Промпт от архитектора использовал временное имя `RulesGen`; решение фиксирует переименование под выбранный бренд + домен `konvey.pro`.
+
+**Дополнительные материалы получены и в репо:**
+- `backend/tests/fixtures/EnterpriseData_1_0_1.xsd` (компактная версия XSD для unit-тестов)
+- `examples/enterprise_data_docs/ExchangeMessage.xsd` (базовая wrapper-схема для всех EnterpriseData пакетов)
+- `examples/enterprise_data_docs/01-04_*.pdf` (4 официальных документа от 1С)
+- `examples/enterprise_data_docs/enterprisedata_1_0.html` (HTML-документация)
+- `docs/REFERENCE_EXT.md` — извлечённое описание механизма `ext1:*` extensions (см. ADR-008)
 
 ---
 
@@ -33,7 +44,7 @@ Sprint 0 завершён. Создан рабочий скелет проект
 | D8. Workspace каркас | ✓ done | Header + ObjectsSidebar + MappingArea (three-pane trees) + Inspector + Bottom Dock с табами-заглушками |
 | D9. Python sidecar | ✓ done | parsers (xsd, config), models (project, ed, config), storage, rpc.py, __main__.py. **Все тесты проходят (30/30).** Smoke-test против реального XSD 1.8.6 успешен. |
 | D10. Модель проекта (Pydantic) | ✓ done | `Project`, `ProjectSummary`, `NewProjectData` — соответствует промпту |
-| D11. Vertical slice TS↔Rust↔Python | ⚠ partial | Код всех трёх слоёв написан и типизирован end-to-end. **НЕ ПРОВЕРЕНО:** реальный run-time прогон без `cargo build` + `npm install` невозможен. |
+| D11. Vertical slice TS↔Rust↔Python | ✓ **done** | Верифицировано end-to-end после 8 разовых фиксов. См. **ADR-007**. Парсинг real EnterpriseData_1_8_6.xsd через TS invoke → Rust JSON-RPC → Python lxml → возврат в UI — подтверждено визуально владельцем. Wizard 4 шагов прошёл, Workspace с тремя деревьями работает, project persists, file picker работает. |
 | D12. build-sidecar.ps1 и dev.ps1 | ✓ done | Полные PowerShell-скрипты. `build-sidecar.sh` добавлен бонусом для cross-platform. |
 | D13. SPRINT_0_REPORT.md | ✓ done | Этот файл |
 
@@ -51,6 +62,8 @@ Sprint 0 завершён. Создан рабочий скелет проект
 | ADR-004 | Project — единый Pydantic-объект с эмбеддед EnterpriseDataSchema и Configuration |
 | ADR-005 | Имя проекта — Konvey (не RulesGen из промпта) |
 | ADR-006 | npm вместо pnpm для Sprint 0 (pnpm не установлен на машине разработки) |
+| **ADR-007** | **Vertical Slice верифицирован end-to-end** — 8 разовых блокеров пофикшены, окно запускается, парсинг real XSD работает |
+| **ADR-008** | **EnterpriseData extensions (`ext1:*`)** — отложено в Sprint 2+, но модели Sprint 1 готовы (namespace-aware поля) |
 
 ---
 
@@ -214,7 +227,13 @@ C:\BUFFER\Konvey\
 | 16 | QUESTIONS.md содержит вопросы | ✓ done | 8 questions (Q1–Q8) |
 | 17 | DECISIONS.md содержит 4+ ADR | ✓ done | **6 ADRs** |
 
-**Итог: 13/17 done, 4/17 ⚠ partial (требует верификации владельцем — установка Rust toolchain, npm install).**
+**Итог: 17/17 done после ADR-007.** Все ⚠ partial пункты Sprint 0 верифицированы на машине владельца:
+- Tauri dev запускается ✓
+- Wizard полностью проходит (XSD загружается, конфигурации парсятся, объекты отмечаются, проект создаётся) ✓
+- Workspace отрисовывается с тремя деревьями ✓
+- File picker работает ✓
+- Project persists / restore ✓
+- Все Sprint 0 deliverables считаются принятыми
 
 ---
 
