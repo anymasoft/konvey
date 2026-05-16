@@ -72,6 +72,24 @@
 
 ---
 
+## Q9. MSVC Build Tools — обнаружено при первой попытке запуска
+
+**Контекст:** Tauri 2 на Windows требует MSVC linker (`link.exe`), который входит в workload «Desktop development with C++» Visual Studio. На машине разработки была установлена VS 2022 Community **без** этого workload — `cargo build` упал с `error: linker 'link.exe' not found`.
+
+**Найденное решение:** установка C++ workload через `vs_installer modify --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended` (~3-7 GB, 10-20 мин).
+
+**Что не сделано в Sprint 0:** не было автоматизированного pre-flight чека окружения. Sprint 0 SETUP.md просто пишет "Rust toolchain", но не проверяет наличие C++ tools.
+
+**Вопрос архитектору:** в Sprint 1 добавить `scripts/check-env.ps1`, который перед `npm run tauri dev` проверяет:
+- `rustc --version`
+- `link.exe` доступен в PATH
+- `node --version`, `npm --version`
+- Python venv существует в `backend/.venv/`
+
+И даёт чёткое сообщение «установите вот это» при сбое любой проверки.
+
+---
+
 ## Q8. Anthropic API key — где хранить
 
 **Контекст:** Sprint 0 не интегрирует Anthropic API. Но архитектурно — где хранить API key пользователя на disk? Plain text JSON в %APPDATA% — небезопасно.
