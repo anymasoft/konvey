@@ -2,14 +2,27 @@
  * Generic tree view component.
  * Each node has: label, optional type-icon hint, optional children.
  * Renders <details>/<summary> for collapsibility (zero-dep, accessible).
+ *
+ * Sprint 0.5: each leaf node carries `data-mapping-anchor-id` so Sprint 1's
+ * SVG mapping overlay can position lines via document.querySelector. The
+ * attribute name MUST NOT change later.
  */
 import type { ReactNode } from "react";
+import styles from "./Workspace.module.css";
 
 export interface TreeNode {
   id: string;
   label: string;
   hint?: string;
   children?: TreeNode[];
+  /**
+   * Anchor id for SVG mapping overlay (Sprint 1).
+   * Format: `<side>:<objectName>.<fieldPath>` e.g. "source:Document.Реализация.Контрагент".
+   * If not provided, the leaf is not a valid mapping target (e.g., group headers).
+   */
+  anchorId?: string;
+  /** Field type for [data-field-type] CSS selectors */
+  fieldType?: string;
 }
 
 interface Props {
@@ -19,24 +32,36 @@ interface Props {
 
 function TreeNodeView({ node }: { node: TreeNode }) {
   const hasChildren = node.children && node.children.length > 0;
+
   if (!hasChildren) {
+    // Leaf node — eligible mapping anchor (if anchorId set)
     return (
-      <div className="k-tree-leaf" style={{ paddingLeft: 16, fontSize: 12 }}>
-        <span>{node.label}</span>
+      <div
+        className={styles.treeLeaf}
+        data-mapping-anchor-id={node.anchorId}
+        data-field-type={node.fieldType}
+      >
+        <span className={styles.treeNodeName}>{node.label}</span>
         {node.hint && (
-          <span style={{ color: "var(--k-text-3)", marginLeft: 8 }}>
-            : <span className="k-mono">{node.hint}</span>
-          </span>
+          <span className={styles.treeNodeHint}>: {node.hint}</span>
         )}
       </div>
     );
   }
+
   return (
     <details open style={{ paddingLeft: 8 }}>
-      <summary style={{ cursor: "pointer", fontSize: 12, padding: "2px 0" }}>
+      <summary>
         <span style={{ fontWeight: 500 }}>{node.label}</span>
         {node.hint && (
-          <span style={{ color: "var(--k-text-3)", marginLeft: 8, fontSize: 11 }}>
+          <span
+            style={{
+              color: "var(--k-text-3)",
+              marginLeft: 8,
+              fontSize: 11,
+              fontFamily: "var(--k-font-mono)",
+            }}
+          >
             {node.hint}
           </span>
         )}

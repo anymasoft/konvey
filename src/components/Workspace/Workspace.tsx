@@ -12,92 +12,78 @@ import { useProjectStore } from "@/stores/projectStore";
 import { ObjectsSidebar } from "./ObjectsSidebar";
 import { MappingArea } from "./MappingArea";
 import { Inspector } from "./Inspector";
+import styles from "./Workspace.module.css";
+
+type DockTab = "problems" | "xml" | "ai" | "history";
+
+const DOCK_TAB_DEFINITIONS: Array<{ key: DockTab; label: string; sprint: string }> = [
+  { key: "problems", label: "Problems", sprint: "Sprint 2" },
+  { key: "xml", label: "Generated XML", sprint: "Sprint 3" },
+  { key: "ai", label: "AI Chat", sprint: "Sprint 2" },
+  { key: "history", label: "History", sprint: "Sprint 4+" },
+];
 
 export function Workspace() {
   const project = useProjectStore((s) => s.project);
   const closeProject = useAppStore((s) => s.closeProject);
-  const [dockTab, setDockTab] = useState<"problems" | "xml" | "ai" | "history" | null>(null);
+  const [dockTab, setDockTab] = useState<DockTab | null>(null);
 
   if (!project) return null;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <header
-        className="k-header"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          padding: "0 12px",
-          height: 44,
-          background: "var(--k-panel)",
-          borderBottom: "1px solid var(--k-border)",
-        }}
-      >
+    <div className={styles.root}>
+      <header className={styles.header}>
         <div
-          className="k-burger"
-          style={{ width: 26, height: 26, display: "grid", placeItems: "center", cursor: "pointer" }}
+          className={styles.burger}
           onClick={closeProject}
           title="К списку проектов"
         >
           ≡
         </div>
-        <div className="k-logo">Konvey</div>
-        <div style={{ color: "var(--k-text-3)" }}>·</div>
-        <div className="k-project-name">{project.name}</div>
-        <div style={{ flex: 1, color: "var(--k-text-3)", textAlign: "center", fontSize: 11 }}>
-          {project.source_configuration.name} → {project.target_configuration.name} ·{" "}
+        <div className={styles.logo}>Konvey</div>
+        <div className={styles.divider}>·</div>
+        <div className={styles.projectName}>{project.name}</div>
+        <div className={styles.headerCenter}>
+          {project.source_configuration.name} → {project.target_configuration.name} ·
           EnterpriseData {project.enterprise_data.version}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="k-btn" disabled title="Доступно в следующих спринтах">Validate</button>
-          <button className="k-btn" disabled title="Доступно в следующих спринтах">Preview</button>
-          <button className="k-btn" disabled title="Доступно в следующих спринтах">Export</button>
+        <div className={styles.headerActions}>
+          <button className="k-btn" disabled title="Доступно после Sprint 2">
+            Validate
+          </button>
+          <button className="k-btn" disabled title="Доступно после Sprint 3">
+            Preview
+          </button>
+          <button className="k-btn" disabled title="Доступно после Sprint 3">
+            Export
+          </button>
         </div>
       </header>
 
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+      <div className={styles.body}>
         <ObjectsSidebar />
         <MappingArea />
         <Inspector />
       </div>
 
-      <div
-        style={{
-          borderTop: "1px solid var(--k-border)",
-          background: "var(--k-panel)",
-          fontSize: 11,
-          color: "var(--k-text-3)",
-        }}
-      >
-        <div style={{ display: "flex", gap: 0, padding: "4px 8px" }}>
-          {(
-            [
-              ["problems", "Problems"],
-              ["xml", "Generated XML"],
-              ["ai", "AI Chat"],
-              ["history", "History"],
-            ] as const
-          ).map(([key, label]) => (
+      <div className={styles.bottomDock}>
+        <div className={styles.dockTabs}>
+          {DOCK_TAB_DEFINITIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setDockTab(dockTab === key ? null : key)}
-              style={{
-                background: dockTab === key ? "var(--k-panel-sunk)" : "transparent",
-                border: "none",
-                padding: "4px 12px",
-                fontSize: 11,
-                cursor: "pointer",
-                color: "var(--k-text-2)",
-              }}
+              className={`${styles.dockTab} ${dockTab === key ? styles.dockTabActive : ""}`}
             >
               {label}
             </button>
           ))}
         </div>
         {dockTab && (
-          <div style={{ padding: 12, color: "var(--k-text-3)", minHeight: 60 }}>
-            Эта панель ({dockTab}) будет доступна в следующих спринтах.
+          <div className={styles.dockContent}>
+            {dockTab === "problems" && "Проблемы появятся после запуска валидации (Sprint 2)."}
+            {dockTab === "xml" && "Сгенерированные правила XML появятся после маппинга (Sprint 3)."}
+            {dockTab === "ai" && "AI помощник появится после интеграции с Anthropic API (Sprint 2)."}
+            {dockTab === "history" && "История изменений проекта появится после первого сохранения (Sprint 4+)."}
           </div>
         )}
       </div>

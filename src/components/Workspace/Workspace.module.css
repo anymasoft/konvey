@@ -1,1 +1,340 @@
-/* Sprint 0: styles inlined in components for speed. Module file kept for future structure. */
+/* Workspace — main mapping screen. All Workspace sub-components share this module. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 12px;
+  height: 44px;
+  background: var(--k-panel);
+  border-bottom: 1px solid var(--k-border);
+}
+
+.burger {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: var(--k-radius);
+  color: var(--k-text-2);
+  font-size: 18px;
+  user-select: none;
+}
+
+.burger:hover {
+  background: var(--k-panel-sunk);
+}
+
+.logo {
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+}
+
+.divider {
+  color: var(--k-text-3);
+}
+
+.projectName {
+  font-weight: 500;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: var(--k-radius);
+  cursor: text;
+}
+
+.projectName:hover {
+  background: var(--k-panel-sunk);
+}
+
+.headerCenter {
+  flex: 1;
+  color: var(--k-text-3);
+  text-align: center;
+  font-size: 11px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* === Bottom dock === */
+.bottomDock {
+  border-top: 1px solid var(--k-border);
+  background: var(--k-panel);
+  font-size: 11px;
+  color: var(--k-text-3);
+}
+
+.dockTabs {
+  display: flex;
+  gap: 0;
+  padding: 4px 8px;
+}
+
+.dockTab {
+  background: transparent;
+  border: none;
+  padding: 4px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--k-text-2);
+  font-family: var(--k-font-sans);
+}
+
+.dockTab:hover {
+  background: var(--k-panel-sunk);
+}
+
+.dockTabActive {
+  background: var(--k-panel-sunk);
+  border-bottom: 2px solid var(--k-accent);
+}
+
+.dockContent {
+  padding: 12px;
+  color: var(--k-text-3);
+  min-height: 60px;
+}
+
+/* === ObjectsSidebar (left) === */
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--k-panel);
+  border-right: 1px solid var(--k-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebarSearch {
+  padding: 8px;
+  border-bottom: 1px solid var(--k-divider);
+}
+
+.sidebarBody {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+.sidebarFooter {
+  padding: 8px;
+  border-top: 1px solid var(--k-divider);
+  font-size: 11px;
+  color: var(--k-text-3);
+}
+
+.sidebarTypeGroup summary {
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--k-text-2);
+}
+
+.sidebarItemList {
+  list-style: none;
+  padding: 0 0 4px 12px;
+  margin: 0;
+}
+
+.sidebarItem {
+  padding: 3px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--k-radius-sm);
+  color: var(--k-text);
+  transition: background 100ms ease;
+}
+
+.sidebarItem:hover {
+  background: var(--k-panel-sunk);
+}
+
+.sidebarItemSelected {
+  background: var(--k-accent-50);
+  color: var(--k-accent-text);
+}
+
+.sidebarItemSelected:hover {
+  background: var(--k-accent-50);
+}
+
+.sidebarEmpty {
+  font-size: 12px;
+  color: var(--k-text-3);
+  padding: 8px;
+}
+
+/* === MappingArea (center, 3-pane) === */
+.mappingArea {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  background: var(--k-panel-2);
+}
+
+.mappingPlaceholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--k-text-3);
+  font-size: 14px;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--k-border);
+}
+
+.paneLast {
+  border-right: none;
+}
+
+.paneTitle {
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--k-panel-sunk);
+  border-bottom: 1px solid var(--k-divider);
+  color: var(--k-text-2);
+}
+
+.paneBody {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+.paneEmpty {
+  font-size: 12px;
+  color: var(--k-text-3);
+}
+
+.paneEmptyHint {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+/* === Inspector (right) === */
+.inspector {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--k-panel);
+  border-left: 1px solid var(--k-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.inspectorCollapsed {
+  width: 30px;
+  flex-shrink: 0;
+  background: var(--k-panel);
+  border-left: 1px solid var(--k-border);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.inspectorCollapsedLabel {
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  color: var(--k-text-3);
+}
+
+.inspectorHeader {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--k-divider);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inspectorTitle {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inspectorCollapseBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--k-text-3);
+}
+
+.inspectorBody {
+  flex: 1;
+  padding: 16px;
+  color: var(--k-text-3);
+  font-size: 12px;
+  overflow: auto;
+}
+
+.inspectorBody p {
+  margin: 0 0 16px 0;
+}
+
+.inspectorHint {
+  font-size: 11px;
+}
+
+/* === TreeView (used inside MappingArea panes) === */
+.treeNode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  font-size: 12px;
+  border-radius: var(--k-radius-sm);
+  color: var(--k-text);
+}
+
+.treeNode:hover {
+  background: var(--k-panel-sunk);
+}
+
+.treeNodeName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.treeNodeHint {
+  font-family: var(--k-font-mono);
+  font-size: 11px;
+  color: var(--k-text-3);
+  flex-shrink: 0;
+}
+
+.treeLeaf {
+  padding-left: 16px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

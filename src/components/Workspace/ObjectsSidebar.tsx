@@ -4,6 +4,7 @@
  */
 import { useMemo, useState } from "react";
 import { useProjectStore } from "@/stores/projectStore";
+import styles from "./Workspace.module.css";
 
 export function ObjectsSidebar() {
   const project = useProjectStore((s) => s.project);
@@ -28,18 +29,8 @@ export function ObjectsSidebar() {
   if (!project) return null;
 
   return (
-    <aside
-      style={{
-        width: 280,
-        flexShrink: 0,
-        background: "var(--k-panel)",
-        borderRight: "1px solid var(--k-border)",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <div style={{ padding: 8, borderBottom: "1px solid var(--k-divider)" }}>
+    <aside className={styles.sidebar}>
+      <div className={styles.sidebarSearch}>
         <input
           className="k-input"
           type="search"
@@ -50,28 +41,20 @@ export function ObjectsSidebar() {
         />
       </div>
 
-      <div style={{ flex: 1, overflow: "auto", padding: 8 }}>
+      <div className={styles.sidebarBody}>
         {project.selected_objects.length === 0 ? (
-          <div style={{ fontSize: 12, color: "var(--k-text-3)", padding: 8 }}>
+          <div className={styles.sidebarEmpty}>
             Ни одного объекта в обмене.
             <br />
-            (В Sprint 0 объекты выбираются в Wizard'е и не редактируются здесь.)
+            (Объекты выбираются в Wizard'е и пока не редактируются здесь.)
           </div>
         ) : (
           Object.entries(groupedObjects).map(([type, fullNames]) => (
-            <details key={type} open>
-              <summary
-                style={{
-                  cursor: "pointer",
-                  padding: "4px 6px",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "var(--k-text-2)",
-                }}
-              >
+            <details key={type} open className={styles.sidebarTypeGroup}>
+              <summary>
                 {type} ({fullNames.length})
               </summary>
-              <ul style={{ listStyle: "none", padding: "0 0 4px 12px", margin: 0 }}>
+              <ul className={styles.sidebarItemList}>
                 {fullNames.map((fn) => {
                   const isSelected = fn === selected;
                   const name = fn.split(".").slice(1).join(".");
@@ -79,14 +62,7 @@ export function ObjectsSidebar() {
                     <li
                       key={fn}
                       onClick={() => setSelected(fn)}
-                      style={{
-                        padding: "3px 6px",
-                        fontSize: 12,
-                        cursor: "pointer",
-                        background: isSelected ? "var(--k-accent-50)" : "transparent",
-                        color: isSelected ? "var(--k-accent-text)" : "var(--k-text)",
-                        borderRadius: "var(--k-radius-sm)",
-                      }}
+                      className={`${styles.sidebarItem} ${isSelected ? styles.sidebarItemSelected : ""}`}
                     >
                       {name}
                     </li>
@@ -98,14 +74,7 @@ export function ObjectsSidebar() {
         )}
       </div>
 
-      <div
-        style={{
-          padding: 8,
-          borderTop: "1px solid var(--k-divider)",
-          fontSize: 11,
-          color: "var(--k-text-3)",
-        }}
-      >
+      <div className={styles.sidebarFooter}>
         Всего в обмене: {project.selected_objects.length} объектов
       </div>
     </aside>
