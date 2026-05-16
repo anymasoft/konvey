@@ -13,6 +13,7 @@ import { Icon, type IconName } from "@/components/icons";
 import { ObjectsSidebar } from "./ObjectsSidebar";
 import { MappingArea } from "./MappingArea";
 import { Inspector } from "./Inspector";
+import { HeaderProgress } from "./HeaderProgress";
 import styles from "./Workspace.module.css";
 
 type DockTab = "problems" | "xml" | "ai" | "history";
@@ -31,6 +32,13 @@ export function Workspace() {
 
   if (!project) return null;
 
+  // Sprint 0.5: mapping engine not implemented yet, all counts are 0.
+  // Sprint 1 will compute these from project.mappings.
+  const mapped = 0;
+  const total = 0;
+  const review = 0;
+  const conflicts = 0;
+
   return (
     <div className={styles.root}>
       <header className={styles.header}>
@@ -44,11 +52,12 @@ export function Workspace() {
         </button>
         <div className={styles.logo}>Konvey</div>
         <div className={styles.divider}>·</div>
-        <div className={styles.projectName}>{project.name}</div>
-        <div className={styles.headerCenter}>
-          {project.source_configuration.name} → {project.target_configuration.name} ·
-          EnterpriseData {project.enterprise_data.version}
+        <div className={styles.projectName} title={project.name}>
+          {project.name}
         </div>
+
+        <HeaderProgress mapped={mapped} total={total} review={review} conflicts={conflicts} />
+
         <div className={styles.headerActions}>
           <button className={`k-btn ${styles.headerBtn}`} disabled title="Доступно после Sprint 2">
             <Icon name="validate" size={14} />

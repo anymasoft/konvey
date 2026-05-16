@@ -17,6 +17,7 @@ import { Step1Name } from "./Step1Name";
 import { Step2Source } from "./Step2Source";
 import { Step3Target } from "./Step3Target";
 import { Step4Objects } from "./Step4Objects";
+import { Icon } from "@/components/icons";
 import styles from "./Wizard.module.css";
 
 export interface WizardState {
@@ -102,12 +103,32 @@ export function Wizard() {
       <header className={styles.header}>
         <div className={styles.title}>Новый проект Konvey</div>
         <div className={styles.steps}>
-          {[1, 2, 3, 4].map((s) => (
-            <div
-              key={s}
-              className={`${styles.stepIndicator} ${s <= step ? styles.stepIndicatorActive : ""}`}
-            />
-          ))}
+          {[1, 2, 3, 4].map((s) => {
+            const isComplete = s < step;
+            const isActive = s === step;
+            return (
+              <div key={s} className={styles.stepIndicator}>
+                {isComplete ? (
+                  <span className={styles.stepCheck} aria-label={`Шаг ${s} пройден`}>
+                    <Icon name="check" size={10} color="white" />
+                  </span>
+                ) : isActive ? (
+                  <span className={`${styles.stepCheck} ${styles.stepCheckActive}`}>
+                    {s}
+                  </span>
+                ) : (
+                  <span className={styles.stepNumberPending}>{s}</span>
+                )}
+                {s < 4 && (
+                  <div
+                    className={`${styles.stepBar} ${
+                      isComplete ? styles.stepBarComplete : isActive ? styles.stepBarActive : ""
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
         <div className={styles.stepLabel}>Шаг {step} из 4</div>
       </header>

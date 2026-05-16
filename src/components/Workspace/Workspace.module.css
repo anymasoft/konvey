@@ -59,9 +59,63 @@
 
 .headerCenter {
   flex: 1;
-  color: var(--k-text-3);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: 11.5px;
+  color: var(--k-text-2);
+}
+
+.headerProgressBar {
+  width: 180px;
+  height: 6px;
+  background: var(--k-panel-sunk);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.headerProgressFill {
+  height: 100%;
+  background: var(--k-accent);
+  border-radius: 999px;
+  transition: width 200ms ease;
+}
+
+.headerProgressStats {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--k-font-mono);
   font-size: 11px;
+  color: var(--k-text-2);
+}
+
+.headerProgressStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.headerProgressStatDim {
+  color: var(--k-text-3);
+}
+
+.headerProgressStatWarn {
+  color: var(--k-amber);
+}
+
+.headerProgressStatErr {
+  color: var(--k-red);
+}
+
+.headerProgressDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .headerActions {
@@ -159,16 +213,18 @@
 
 .sidebarSearchInput {
   width: 100%;
-  padding-left: 30px;
+  /* Increased to clear icon + breathing room (icon is 12px wide + 14px left + 8px gap = 34px) */
+  padding-left: 30px !important;
 }
 
 .sidebarSearchIcon {
   position: absolute;
-  left: 16px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--k-text-3);
   pointer-events: none;
+  z-index: 1;
 }
 
 .sidebarBody {
@@ -339,7 +395,7 @@
 .inspectorBody {
   flex: 1;
   padding: 16px;
-  color: var(--k-text-3);
+  color: var(--k-text-2);
   font-size: 12px;
   overflow: auto;
 }
@@ -350,6 +406,98 @@
 
 .inspectorHint {
   font-size: 11px;
+  color: var(--k-text-3);
+}
+
+.inspectorSection {
+  margin-bottom: 20px;
+}
+
+.inspectorSectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--k-text-3);
+  margin-bottom: 8px;
+}
+
+.inspectorFieldRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--k-divider);
+}
+
+.inspectorFieldRow:last-child {
+  border-bottom: none;
+}
+
+.inspectorFieldLabel {
+  color: var(--k-text-3);
+  flex-shrink: 0;
+}
+
+.inspectorFieldValue {
+  font-family: var(--k-font-mono);
+  font-size: 11.5px;
+  color: var(--k-text);
+  text-align: right;
+  word-break: break-all;
+}
+
+.inspectorStatBox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.inspectorStatCell {
+  padding: 8px 10px;
+  background: var(--k-panel-sunk);
+  border-radius: var(--k-radius);
+}
+
+.inspectorStatLabel {
+  font-size: 10px;
+  color: var(--k-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inspectorStatValue {
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--k-font-mono);
+  margin-top: 2px;
+  color: var(--k-text);
+}
+
+.inspectorObjectHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.inspectorObjectName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--k-text);
+  word-break: break-all;
+}
+
+.inspectorObjectType {
+  font-family: var(--k-font-mono);
+  font-size: 10px;
+  color: var(--k-text-3);
+  background: var(--k-panel-sunk);
+  padding: 2px 6px;
+  border-radius: var(--k-radius-sm);
 }
 
 /* === TreeView (used inside MappingArea panes) ===
