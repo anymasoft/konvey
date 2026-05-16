@@ -17,8 +17,6 @@ use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, ChildStdin, Command};
 use tokio::sync::{oneshot, Mutex};
-// stdin shutdown trait
-use tokio::io::AsyncWrite;
 
 /// Pending requests keyed by JSON-RPC id, waiting for stdout response.
 type PendingMap = Arc<Mutex<HashMap<u64, oneshot::Sender<Value>>>>;
@@ -146,10 +144,11 @@ impl Sidecar {
         Ok(resp.get("result").cloned().unwrap_or(Value::Null))
     }
 
-    /// Graceful shutdown — close stdin, wait briefly, then kill.
+    /// Graceful shutdown: close stdin, wait briefly, then kill.
     pub async fn stop(&mut self) -> Result<()> {
-        // Closing stdin signals the Python loop to exit
-        drop(&mut self.stdin);
+        // shutdown() flushes and closes the write half of stdin.
+        // Python's `for line in stdin` loop in __main__.py then sees EOF and exits cleanly.
+        let _ = self.stdin.shutdown().await;
         // Best-effort wait, then ensure dead.
         // tokio::time::timeout returns Result<Result<ExitStatus, io::Error>, Elapsed>:
         //   outer Ok  = wait completed within timeout
