@@ -28,6 +28,7 @@ function configObjectToTree(obj: MetadataObject, side: Side): TreeNode[] {
     nodes.push({
       id: `${obj.full_name}-header`,
       label: "Реквизиты шапки",
+      iconName: "edit",
       children: obj.attributes.map((a) => ({
         id: `${obj.full_name}-attr-${a.name}`,
         label: a.name,
@@ -42,9 +43,11 @@ function configObjectToTree(obj: MetadataObject, side: Side): TreeNode[] {
     nodes.push({
       id: `${obj.full_name}-ts`,
       label: "Табличные части",
+      iconName: "tabular-section",
       children: obj.tabular_sections.map((ts) => ({
         id: `${obj.full_name}-ts-${ts.name}`,
         label: ts.name,
+        iconName: "tabular-section",
         children: ts.attributes.map((a) => ({
           id: `${obj.full_name}-ts-${ts.name}-${a.name}`,
           label: a.name,
@@ -60,6 +63,7 @@ function configObjectToTree(obj: MetadataObject, side: Side): TreeNode[] {
     nodes.push({
       id: `${obj.full_name}-dims`,
       label: "Измерения",
+      iconName: "filter",
       children: obj.dimensions.map((a) => ({
         id: `${obj.full_name}-dim-${a.name}`,
         label: a.name,
@@ -74,6 +78,7 @@ function configObjectToTree(obj: MetadataObject, side: Side): TreeNode[] {
     nodes.push({
       id: `${obj.full_name}-res`,
       label: "Ресурсы",
+      iconName: "register-accum",
       children: obj.resources.map((a) => ({
         id: `${obj.full_name}-res-${a.name}`,
         label: a.name,
@@ -88,6 +93,7 @@ function configObjectToTree(obj: MetadataObject, side: Side): TreeNode[] {
     nodes.push({
       id: `${obj.full_name}-vals`,
       label: "Значения",
+      iconName: "enum",
       children: obj.enum_values.map((v) => ({
         id: `${obj.full_name}-val-${v}`,
         label: v,
