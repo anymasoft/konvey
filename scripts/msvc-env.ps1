@@ -47,9 +47,17 @@ Write-Host "Loading MSVC environment from:"
 Write-Host "  $vsDevCmd"
 
 # Run VsDevCmd.bat inside cmd, then dump environment, parse into PowerShell session.
-# `-arch=amd64 -host_arch=amd64` = 64-bit toolchain (matches our Rust target x86_64-pc-windows-msvc).
-# `-no_logo` suppresses copyright banner.
-$envDump = cmd /c "`"$vsDevCmd`" -arch=amd64 -host_arch=amd64 -no_logo && set"
+# Use a temp .bat wrapper to avoid the "too long input string" cmd /c limit when
+# combining the long VsDevCmd path with arguments and chained set command.
+$tmpBat = [System.IO.Path]::GetTempFileName() + ".bat"
+@"
+@echo off
+call "$vsDevCmd" -arch=amd64 -host_arch=amd64 -no_logo
+set
+"@ | Out-File -FilePath $tmpBat -Encoding ASCII
+
+$envDump = cmd /c $tmpBat
+Remove-Item $tmpBat -ErrorAction SilentlyContinue
 
 $applied = 0
 foreach ($line in $envDump) {

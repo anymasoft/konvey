@@ -148,8 +148,11 @@ impl Sidecar {
     pub async fn stop(&mut self) -> Result<()> {
         // Closing stdin signals the Python loop to exit
         drop(&mut self.stdin);
-        // Best-effort wait, then ensure dead
-        if let Ok(Some(status)) =
+        // Best-effort wait, then ensure dead.
+        // tokio::time::timeout returns Result<Result<ExitStatus, io::Error>, Elapsed>:
+        //   outer Ok  = wait completed within timeout
+        //   inner Ok  = process exited cleanly
+        if let Ok(Ok(status)) =
             tokio::time::timeout(std::time::Duration::from_secs(2), self.child.wait()).await
         {
             log::info!("Sidecar exited with status {:?}", status);
