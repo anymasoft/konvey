@@ -1,0 +1,59 @@
+/* Supplementary classes used by Konvey React components, in addition to konvey-design.css */
+
+.k-input {
+  font-family: var(--k-font-sans);
+  font-size: 12px;
+  padding: 6px 8px;
+  background: var(--k-panel);
+  color: var(--k-text);
+  border: 1px solid var(--k-border-strong);
+  border-radius: var(--k-radius);
+  outline: none;
+  transition: border-color 120ms;
+}
+
+.k-input:focus {
+  border-color: var(--k-accent);
+  box-shadow: 0 0 0 2px var(--k-accent-50);
+}
+
+.k-input:disabled {
+  background: var(--k-panel-sunk);
+  color: var(--k-text-4);
+  cursor: not-allowed;
+}
+
+.k-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.k-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--k-text-2);
+}
+
+.k-hint {
+  font-size: 11px;
+  color: var(--k-text-3);
+}
+
+/* Tree view leaf */
+.k-tree-leaf {
+  padding: 2px 0;
+  color: var(--k-text);
+}
+
+/* Ensure body uses our app font and bg */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--k-font-sans);
+  background: var(--k-bg);
+  color: var(--k-text);
+}
+
+* { box-sizing: border-box; }
