@@ -36,6 +36,9 @@ if (-not (Test-Path $VenvPython)) {
 # Step 4: Tell sidecar.rs to use dev mode
 $env:KONVEY_SIDECAR_MODE = "dev"
 $env:KONVEY_SIDECAR_PYTHON = $VenvPython
+$env:KONVEY_BACKEND_DIR = "$RepoRoot\backend"
+# Make sure we see info-level Rust logs (sidecar lifecycle + Python stderr)
+if (-not $env:RUST_LOG) { $env:RUST_LOG = "info" }
 
 Push-Location $RepoRoot
 try {

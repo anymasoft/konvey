@@ -29,40 +29,86 @@ pub struct Sidecar {
 }
 
 impl Sidecar {
+    /// Find the backend/ directory relative to the running konvey.exe.
+    /// In dev mode the exe lives in src-tauri/target/debug/, and backend/ is two levels up.
+    /// We walk up the tree looking for a folder named "backend" with src/konvey_backend/__init__.py.
+    fn find_backend_dir() -> Option<std::path::PathBuf> {
+        if let Ok(env_dir) = std::env::var("KONVEY_BACKEND_DIR") {
+            let p = std::path::PathBuf::from(env_dir);
+            if p.exists() {
+                return Some(p);
+            }
+        }
+        let exe = std::env::current_exe().ok()?;
+        let mut p = exe.parent()?.to_path_buf();
+        for _ in 0..8 {
+            let candidate = p.join("backend");
+            if candidate.join("src").join("konvey_backend").join("__init__.py").exists() {
+                return Some(candidate);
+            }
+            p = p.parent()?.to_path_buf();
+        }
+        None
+    }
+
     pub async fn start(_app: &tauri::AppHandle) -> Result<Self> {
         let dev_mode =
             std::env::var("KONVEY_SIDECAR_MODE").unwrap_or_default().to_lowercase() == "dev";
 
         let mut child = if dev_mode {
-            // Dev: run Python from backend/ directory via .venv
-            log::info!("Starting sidecar in DEV mode (python -m konvey_backend)");
-            Command::new("python")
-                .args(["-m", "konvey_backend"])
-                .current_dir("../backend")
-                .env("PYTHONPATH", "src")
+            // Dev: run Python from backend/ directory.
+            // CRITICAL: use venv python (system python may lack konvey_backend / lxml / pydantic).
+            // dev.ps1 sets KONVEY_SIDECAR_PYTHON pointing to backend/.venv/Scripts/python.exe.
+            let python = std::env::var("KONVEY_SIDECAR_PYTHON")
+                .unwrap_or_else(|_| "python".to_string());
+
+            let backend_dir = Self::find_backend_dir()
+                .ok_or_else(|| anyhow!(
+                    "Could not locate backend/ directory. Set KONVEY_BACKEND_DIR env var, \
+                     or run from a checkout where backend/src/konvey_backend exists."
+                ))?;
+
+            let pythonpath = backend_dir.join("src");
+
+            log::info!("Starting sidecar in DEV mode:");
+            log::info!("  python: {}", python);
+            log::info!("  cwd:    {}", backend_dir.display());
+            log::info!("  PYTHONPATH: {}", pythonpath.display());
+
+            Command::new(&python)
+                .args(["-u", "-m", "konvey_backend"])  // -u = unbuffered stdout/stderr
+                .current_dir(&backend_dir)
+                .env("PYTHONPATH", &pythonpath)
+                .env("PYTHONIOENCODING", "utf-8")
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .kill_on_drop(true)
                 .spawn()
-                .context("Failed to spawn python sidecar in dev mode")?
+                .with_context(|| format!("Failed to spawn python sidecar: {} -u -m konvey_backend", python))?
         } else {
-            // Prod: launch packaged sidecar exe via Tauri Sidecar.
-            // Tauri 2: tauri::process::Command — но если плагина нет, используем системный exec.
-            // На данном этапе Sprint 0 — простой fallback.
+            // Prod: launch packaged sidecar exe placed next to konvey.exe by Tauri bundler.
             log::info!("Starting sidecar in PROD mode (packaged exe)");
             let exe_name = if cfg!(target_os = "windows") {
                 "konvey-backend.exe"
             } else {
                 "konvey-backend"
             };
-            Command::new(exe_name)
+            // Try next to current exe first, then plain PATH lookup.
+            let path_to_exec = std::env::current_exe()
+                .ok()
+                .and_then(|p| p.parent().map(|d| d.join(exe_name)))
+                .filter(|p| p.exists())
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_else(|| exe_name.to_string());
+
+            Command::new(&path_to_exec)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .kill_on_drop(true)
                 .spawn()
-                .with_context(|| format!("Failed to spawn packaged sidecar {}", exe_name))?
+                .with_context(|| format!("Failed to spawn packaged sidecar {}", path_to_exec))?
         };
 
         let stdin = child.stdin.take().ok_or_else(|| anyhow!("No stdin on sidecar"))?;
@@ -114,7 +160,9 @@ impl Sidecar {
         })
     }
 
-    /// Send a JSON-RPC call and await the response.
+    /// Send a JSON-RPC call and await the response with a 60-second timeout.
+    /// If the sidecar crashed silently, the timeout surfaces the problem as an error
+    /// rather than hanging the UI indefinitely.
     pub async fn call(&mut self, method: &str, params: Value) -> Result<Value> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
 
@@ -127,16 +175,47 @@ impl Sidecar {
         let mut req_line = serde_json::to_string(&req)?;
         req_line.push('\n');
 
+        log::debug!("RPC -> {} (id={}, {} bytes)", method, id, req_line.len());
+
         let (tx, rx) = oneshot::channel();
         {
             let mut pending = self.pending.lock().await;
             pending.insert(id, tx);
         }
 
-        self.stdin.write_all(req_line.as_bytes()).await?;
-        self.stdin.flush().await?;
+        self.stdin
+            .write_all(req_line.as_bytes())
+            .await
+            .with_context(|| format!("Failed to write request {} to sidecar stdin", id))?;
+        self.stdin
+            .flush()
+            .await
+            .with_context(|| format!("Failed to flush sidecar stdin for request {}", id))?;
 
-        let resp = rx.await.context("Sidecar response channel closed")?;
+        // Wait for response with a generous timeout. Parsing a large XSD or 1C config
+        // can legitimately take 10-30 seconds; we give 60s before declaring the sidecar dead.
+        let resp = match tokio::time::timeout(std::time::Duration::from_secs(60), rx).await {
+            Ok(Ok(value)) => value,
+            Ok(Err(_)) => {
+                // oneshot channel dropped without a value — sidecar process died
+                self.pending.lock().await.remove(&id);
+                return Err(anyhow!(
+                    "Sidecar response channel closed for method '{}'. \
+                     Sidecar likely crashed — check stderr logs above for Python traceback.",
+                    method
+                ));
+            }
+            Err(_elapsed) => {
+                // Timeout
+                self.pending.lock().await.remove(&id);
+                return Err(anyhow!(
+                    "Sidecar did not respond to '{}' within 60s. \
+                     Either the operation is too slow or the sidecar is stuck. \
+                     Check stderr logs above for Python errors.",
+                    method
+                ));
+            }
+        };
 
         if let Some(error) = resp.get("error") {
             return Err(anyhow!("Sidecar error: {}", error));
