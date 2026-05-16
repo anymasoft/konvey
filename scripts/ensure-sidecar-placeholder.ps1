@@ -10,7 +10,7 @@
 #
 # In dev mode our sidecar.rs ignores the external bin and runs `python -m
 # konvey_backend` directly (see KONVEY_SIDECAR_MODE=dev). So the placeholder
-# is just to satisfy Tauri's existence check — its contents don't matter.
+# is just to satisfy Tauri's existence check - its contents don't matter.
 #
 # Strategy: copy python.exe from backend venv as the placeholder.
 #  - It's a valid Windows PE executable (Tauri may inspect file headers later)
@@ -38,7 +38,7 @@ if (-not (Test-Path $BinariesDir)) {
 
 $VenvPython = "$RepoRoot\backend\.venv\Scripts\python.exe"
 if (-not (Test-Path $VenvPython)) {
-    Write-Host "ERROR: Cannot create sidecar placeholder — venv python missing at:" -ForegroundColor Red
+    Write-Host "ERROR: Cannot create sidecar placeholder - venv python missing at:" -ForegroundColor Red
     Write-Host "  $VenvPython" -ForegroundColor Red
     Write-Host "Run: cd backend; python -m venv .venv" -ForegroundColor Yellow
     throw "venv python not found"

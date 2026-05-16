@@ -8,12 +8,12 @@
 # Usage:
 #   . .\scripts\msvc-env.ps1
 #
-# (Note the leading dot — that's PowerShell's dot-sourcing operator, which
+# (Note the leading dot - that's PowerShell's dot-sourcing operator, which
 # preserves env-var changes in the calling session.)
 #
 # Why this is needed:
 # VS Build Tools deliberately do NOT add their compiler/linker paths to the
-# system PATH — to avoid conflicts between multiple installed VS versions.
+# system PATH - to avoid conflicts between multiple installed VS versions.
 # Microsoft's standard pattern is to invoke VsDevCmd.bat / Launch-VsDevShell.ps1
 # inside a "Developer Command Prompt" before building. We automate that here.
 #

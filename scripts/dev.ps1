@@ -4,7 +4,7 @@
 # Run Konvey in dev mode: Tauri dev + Python sidecar from venv (no PyInstaller rebuild).
 #
 # Tauri starts the frontend (Vite at :5173) and spawns Python sidecar via the
-# sidecar.rs logic — it checks KONVEY_SIDECAR_MODE env var and runs
+# sidecar.rs logic - it checks KONVEY_SIDECAR_MODE env var and runs
 # `python -m konvey_backend` from backend/.venv when set to "dev".
 #
 # This script ALSO loads MSVC Build Tools environment (required for `cargo build`
