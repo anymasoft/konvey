@@ -1,17 +1,28 @@
 /**
  * Left sidebar of Workspace — list of objects selected for exchange,
  * grouped by metadata type. Click to select an object → activates Center.
+ *
+ * Width is resizable via the divider on the right edge of the sidebar.
+ * Width persisted in localStorage (key: konvey.workspace.sidebarWidth).
  */
 import { useMemo, useState } from "react";
 import { useProjectStore } from "@/stores/projectStore";
+import { useColumnResize } from "./useColumnResize";
 import styles from "./Workspace.module.css";
 
 export function ObjectsSidebar() {
   const project = useProjectStore((s) => s.project);
   const selected = useProjectStore((s) => s.selectedObjectFullName);
   const setSelected = useProjectStore((s) => s.setSelectedObject);
-
   const [search, setSearch] = useState("");
+
+  const { width, isDragging, dragHandleProps } = useColumnResize({
+    storageKey: "konvey.workspace.sidebarWidth",
+    defaultWidth: 280,
+    minWidth: 200,
+    maxWidth: 520,
+    edge: "left",
+  });
 
   const groupedObjects = useMemo(() => {
     if (!project) return {};
@@ -29,54 +40,61 @@ export function ObjectsSidebar() {
   if (!project) return null;
 
   return (
-    <aside className={styles.sidebar}>
-      <div className={styles.sidebarSearch}>
-        <input
-          className="k-input"
-          type="search"
-          placeholder="Поиск по объекту..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ width: "100%" }}
-        />
-      </div>
+    <>
+      <aside className={styles.sidebar} style={{ width: `${width}px` }}>
+        <div className={styles.sidebarSearch}>
+          <input
+            className="k-input"
+            type="search"
+            placeholder="Поиск по объекту..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ width: "100%" }}
+          />
+        </div>
 
-      <div className={styles.sidebarBody}>
-        {project.selected_objects.length === 0 ? (
-          <div className={styles.sidebarEmpty}>
-            Ни одного объекта в обмене.
-            <br />
-            (Объекты выбираются в Wizard'е и пока не редактируются здесь.)
-          </div>
-        ) : (
-          Object.entries(groupedObjects).map(([type, fullNames]) => (
-            <details key={type} open className={styles.sidebarTypeGroup}>
-              <summary>
-                {type} ({fullNames.length})
-              </summary>
-              <ul className={styles.sidebarItemList}>
-                {fullNames.map((fn) => {
-                  const isSelected = fn === selected;
-                  const name = fn.split(".").slice(1).join(".");
-                  return (
-                    <li
-                      key={fn}
-                      onClick={() => setSelected(fn)}
-                      className={`${styles.sidebarItem} ${isSelected ? styles.sidebarItemSelected : ""}`}
-                    >
-                      {name}
-                    </li>
-                  );
-                })}
-              </ul>
-            </details>
-          ))
-        )}
-      </div>
+        <div className={styles.sidebarBody}>
+          {project.selected_objects.length === 0 ? (
+            <div className={styles.sidebarEmpty}>
+              Ни одного объекта в обмене.
+              <br />
+              (Объекты выбираются в Wizard'е и пока не редактируются здесь.)
+            </div>
+          ) : (
+            Object.entries(groupedObjects).map(([type, fullNames]) => (
+              <details key={type} open className={styles.sidebarTypeGroup}>
+                <summary>
+                  {type} ({fullNames.length})
+                </summary>
+                <ul className={styles.sidebarItemList}>
+                  {fullNames.map((fn) => {
+                    const isSelected = fn === selected;
+                    const name = fn.split(".").slice(1).join(".");
+                    return (
+                      <li
+                        key={fn}
+                        onClick={() => setSelected(fn)}
+                        className={`${styles.sidebarItem} ${isSelected ? styles.sidebarItemSelected : ""}`}
+                      >
+                        {name}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </details>
+            ))
+          )}
+        </div>
 
-      <div className={styles.sidebarFooter}>
-        Всего в обмене: {project.selected_objects.length} объектов
-      </div>
-    </aside>
+        <div className={styles.sidebarFooter}>
+          Всего в обмене: {project.selected_objects.length} объектов
+        </div>
+      </aside>
+
+      <div
+        className={`${styles.sidebarResizer} ${isDragging ? styles.sidebarResizerActive : ""}`}
+        {...dragHandleProps}
+      />
+    </>
   );
 }

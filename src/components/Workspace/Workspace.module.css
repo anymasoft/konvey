@@ -113,13 +113,26 @@
 
 /* === ObjectsSidebar (left) === */
 .sidebar {
-  width: 280px;
+  /* width is set dynamically via inline style from useColumnResize */
   flex-shrink: 0;
   background: var(--k-panel);
-  border-right: 1px solid var(--k-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+/* Resizer between sidebar and main body (vertical bar) */
+.sidebarResizer {
+  width: 4px;
+  cursor: col-resize;
+  background: var(--k-border);
+  flex-shrink: 0;
+  transition: background 100ms ease;
+}
+
+.sidebarResizer:hover,
+.sidebarResizerActive {
+  background: var(--k-accent);
 }
 
 .sidebarSearch {
@@ -237,10 +250,9 @@
 
 /* === Inspector (right) === */
 .inspector {
-  width: 340px;
+  /* width is set dynamically via inline style from useColumnResize */
   flex-shrink: 0;
   background: var(--k-panel);
-  border-left: 1px solid var(--k-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
