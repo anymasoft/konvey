@@ -1,130 +1,135 @@
-# Handover to Claude Opus 4.7 — Sprint 0 завершён
+# Handover to Claude Opus 4.7 — Sprint 0.5 завершён
 
-> **Этот документ — готовая копипаста для передачи архитектору (Claude Opus 4.7).** Открой новую сессию с Opus, скопируй текст ниже целиком в первое сообщение.
+> **Этот документ — готовая копипаста для передачи архитектору.** Открой новую сессию или продолжи существующую с Opus, скопируй текст ниже в сообщение.
 
 ---
 
-## Сообщение для Opus
+## Сообщение для Opus (актуальная версия после Sprint 0.5)
 
 ```
-Привет! Sprint 0 проекта Konvey (бывший RulesGen в твоём промпте, переименован
-по решению владельца — см. ADR-005) завершён.
+Привет! Sprint 0.5 "Visual Foundation" завершён. Все 14 deliverables done +
+8 bonus фич (включая твою главную D14 — resizable, и предложенное владельцем
+расширение D14 на sidebars).
 
-GitHub: https://github.com/anymasoft/konvey
-Ветка: main
-Visibility: Public — читай через raw.githubusercontent.com без коннекторов
+ССЫЛКИ ДЛЯ ЧТЕНИЯ:
+- SPRINT_05_REPORT (полный отчёт):
+  https://raw.githubusercontent.com/anymasoft/konvey/main/docs/SPRINT_05_REPORT.md
+- DECISIONS.md (10 ADR, добавлены 009 и 010):
+  https://raw.githubusercontent.com/anymasoft/konvey/main/docs/DECISIONS.md
+- QUESTIONS.md (закрыты Q1-Q9, добавлены Q13-Q15):
+  https://raw.githubusercontent.com/anymasoft/konvey/main/docs/QUESTIONS.md
+- DESIGN_TOKENS.md (47 CSS-переменных):
+  https://raw.githubusercontent.com/anymasoft/konvey/main/docs/DESIGN_TOKENS.md
+- REFERENCE_EXT.md (ext1:* extensions для Sprint 2):
+  https://raw.githubusercontent.com/anymasoft/konvey/main/docs/REFERENCE_EXT.md
+- CLAUDE.md (memory для будущих Claude Code сессий):
+  https://raw.githubusercontent.com/anymasoft/konvey/main/CLAUDE.md
 
-Ключевые URL для тебя:
-- Отчёт Sprint 0: https://raw.githubusercontent.com/anymasoft/konvey/main/docs/SPRINT_0_REPORT.md
-- ADR-записи:      https://raw.githubusercontent.com/anymasoft/konvey/main/docs/DECISIONS.md
-- Вопросы:         https://raw.githubusercontent.com/anymasoft/konvey/main/docs/QUESTIONS.md
-- README:          https://raw.githubusercontent.com/anymasoft/konvey/main/README.md
-- Process doc:     https://raw.githubusercontent.com/anymasoft/konvey/main/docs/PROCESS.md
-- KD 3.1 справка:  https://raw.githubusercontent.com/anymasoft/konvey/main/docs/REFERENCE_TOPICS.md
+ИСХОДНИКИ ДЛЯ ОБЗОРА (ключевые места которые поменялись в 0.5):
+- src/components/icons/Icon.tsx — 36 inline SVG + helpers
+  iconNameForObjectType / iconNameForEdCategory
+- src/components/Workspace/useColumnResize.ts — общий hook для drag-resize
+- src/components/Workspace/Workspace.module.css — финальный CSS Workspace
+- src/components/Workspace/HeaderProgress.tsx — прогресс-бар + 3 счётчика
+- src/components/Workspace/Inspector.tsx — object-state UI (Sprint 1 расширит
+  до mapping details)
+- src/components/Workspace/MappingArea.tsx — три pane с resizable dividers +
+  ED candidate list при failed auto-match
+- backend/src/konvey_backend/models/enterprise_data.py — добавлены namespace
+  поля под Sprint 2 ext1
+- backend/src/konvey_backend/models/project.py — schema_version=2, mappings
+  list placeholder
+- backend/src/konvey_backend/storage/project_storage.py —
+  migrate_project_dict() v1->v2
+- scripts/check-env.ps1 — pre-flight check (закрывает Q1+Q9)
 
-Ключевые исходники для просмотра:
-- backend/src/konvey_backend/parsers/xsd_parser.py     (parser EnterpriseData XSD)
-- backend/src/konvey_backend/parsers/config_parser.py  (parser 1C XML dump)
-- backend/src/konvey_backend/storage/project_storage.py (JSON file persistence)
-- backend/src/konvey_backend/rpc.py                    (JSON-RPC 2.0 over stdio)
-- backend/src/konvey_backend/__main__.py               (sidecar entry point)
-- src-tauri/src/lib.rs                                 (Tauri commands)
-- src-tauri/src/sidecar.rs                             (Python process lifecycle)
-- src/App.tsx + src/components/{ProjectPicker,Wizard,Workspace}
-- src/api/backend.ts                                   (typed wrapper Tauri→Python)
+ЧТО ИЗМЕНИЛОСЬ ВО ВЗАИМОДЕЙСТВИИ С UI ПО СРАВНЕНИЮ С SPRINT 0:
+- Все inline style={{}} переписаны на CSS Modules (ADR-009)
+- Header теперь имеет полноценный progress block — bar + три счётчика с
+  цветными dot'ами (mapped/review/conflicts). В 0.5 все значения 0.
+- Inspector при выборе объекта показывает: type icon + name + synonym +
+  stat box (Реквизиты, ТЧ, Поля ТЧ, Значения) + placeholders под mapping и
+  handlers секции
+- Wizard step indicators — зелёные круги с галочками для пройденных,
+  синие с цифрой для активного, серые для будущих
+- TreeView: каждый leaf node имеет data-mapping-anchor-id="<side>:<obj>.<field>"
+  (контракт для Sprint 1 SVG overlay), type-inferred icon (CatalogRef.* -> 📒)
+- ObjectsSidebar и Inspector resizable (drag ЛКМ)
+- MappingArea колонки resizable
+- Bottom Dock: 4 таба с иконками (Problems/Generated XML/AI Chat/History) —
+  все показывают честные empty states "Sprint N feature"
 
-Что точно работает (проверено end-to-end):
-✅ Python backend: 30/30 pytest PASSED, включая smoke на реальном XSD 1.8.6 (920 KB)
-✅ Frontend tests: 4/4 vitest PASSED
-✅ Vite dev server поднимается на :5173
-✅ GitHub repo создан, код запушен, public
+КЛЮЧЕВЫЕ КОНТРАКТЫ ДЛЯ SPRINT 1:
 
-Что НЕ удалось проверить в этой итерации:
-❌ Полный tauri dev (vertical slice TS↔Rust↔Python) — упало на стадии cargo build
-   с ошибкой "error: linker 'link.exe' not found"
-   Причина: на машине разработки установлена VS 2022 Community, но без workload
-   "Desktop development with C++" (нет MSVC linker). Это известная острая точка
-   Tauri на Windows. См. Q9 в QUESTIONS.md — записал как опыт для Sprint 1.
-   Решение: ставится standalone vs_BuildTools.exe с компонентом VCTools.
+1. SVG mapping anchors. Каждый leaf node в TreeView имеет:
+   data-mapping-anchor-id="<side>:<objectName>.<fieldPath>"
+   Например: source:Document.Реализация.Контрагент
+             ed:Документ.РеализацияТоваровУслуг.Контрагент
+             target:Document.Реализация.Контрагент
+   Имя атрибута зафиксировано — Sprint 1 SVG overlay использует
+   document.querySelector('[data-mapping-anchor-id="..."]').
 
-Принятые решения (полный текст в DECISIONS.md):
-- ADR-001: стек Tauri 2 + React/TS + Python sidecar
-- ADR-002: persistence как JSON-файлы
-- ADR-003: JSON-RPC over stdio (Rust ↔ Python)
-- ADR-004: единый Project Pydantic model
-- ADR-005: имя Konvey (не RulesGen)
-- ADR-006: npm (не pnpm) для Sprint 0
+2. Project schema v2. Project.mappings: list[dict] — placeholder. Sprint 1
+   заменит на list[ObjectMapping] без миграции (Pydantic примет dict-формат
+   если у новых ObjectMapping будут совместимые поля при model_validate).
 
-Открытые вопросы для тебя (9 штук в QUESTIONS.md):
-- Q1: Rust toolchain — установлен
-- Q2: pnpm vs npm — пока npm
-- Q3: env-var KONVEY_SIDECAR_MODE — подтверди имя
-- Q4: глубокая категоризация Russian-prefix → category в XSD
-- Q5: реальная мини-выгрузка 1С для integration теста (опционально)
-- Q6: точная формулировка copyright holder
-- Q7: финальный design system от дизайнера
-- Q8: Anthropic API key storage strategy
-- Q9: pre-flight check скрипт (для Sprint 1)
+3. CSS токены. Все цвета через var(--k-*) переменные. Mapping line colors
+   в Sprint 1:
+     зелёный (high confidence, exact type)    -> var(--k-green)    #1f8a5b
+     амбер  (medium / partial type)           -> var(--k-amber)    #b07418
+     красный (mismatch / conflict)            -> var(--k-red)      #b54545
+     серый (manual / skipped)                 -> var(--k-gray)     #8a8a92
 
-Что ждём от тебя:
-1. Ответы на 9 открытых вопросов
-2. План Sprint 1: что включать?
-   - Mapping engine (drag-and-drop линий между деревьями)?
-   - Auto-mapping по имени реквизита (без LLM)?
-   - Right Inspector с контекстом по выбранному маппингу?
-   - Сохранение mappings в Project JSON?
-3. Приоритет тестового кейса: УТ↔БП vs ERP↔БП vs что-то иное?
-4. Sprint 1.5 "Design Pass" — отдельный спринт ИЛИ часть Sprint 1?
-   Sprint 0 имеет ТЕХНИЧЕСКИЙ ДОЛГ по UI: компоненты используют inline styles
-   вместо классов из konvey-design.css. Визуально результат СИЛЬНО отличается
-   от мокапов Claude Design. Что от тебя нужно: решить — выделять отдельный
-   "Design Pass" спринт между Sprint 1 и Sprint 2 (рекомендую), или вкатить
-   полировку UI параллельно с Sprint 1.
-   Конкретно требует: переписать ProjectPicker/Wizard/Workspace компоненты с
-   полным использованием .k-* классов из global.css, добавить SVG-иконки,
-   привести spacing/typography к мокапам, использовать готовые компоненты
-   из examples/design/konvey-screens.jsx как референс.
+4. Icon API. <Icon name="..." size={14} /> — 36 имён в IconName union.
+   Если Sprint 1 нужна новая иконка — добавить в Icon.tsx union + ICON_DEFS
+   (запись inline SVG из MIT/ISC источника). Никаких dependencies.
 
-Структура репозитория (для контекста):
-- docs/                  — 6 .md документов (PROCESS, DECISIONS, QUESTIONS, REFERENCE_TOPICS, GITHUB_SETUP, SPRINT_0_REPORT)
-- src-tauri/             — Rust shell (Cargo.toml, main.rs, lib.rs, sidecar.rs)
-- src/                   — React frontend (components, stores, types, api)
-- backend/               — Python sidecar (models, parsers, storage, rpc, tests)
-- scripts/               — build-sidecar.ps1, dev.ps1
-- examples/design/       — assets от Claude Design (CSS, JSX, mockup HTML)
-- examples/bsl/          — 9.7 MB пример БSL модуля МенеджерОбменаЧерезУниверсальныйФормат
-                            (это reference data того, что мы будем генерировать)
+ОТВЕТЫ НА Q1-Q9 - все ранее ответили, реализовано.
 
-Метрики Sprint 0:
-- 91 файл в репо
-- Python: ~1200 LOC, тесты: ~430 LOC
-- TS/TSX: ~2000 LOC
-- Rust: ~250 LOC
-- 7 git commits (conventional commits)
+НОВЫЕ ВОПРОСЫ Q13-Q15:
+- Q13: учебная база УЦ№1 — владелец обещал, ждём 3-5 дней
+- Q14: SVG overlay подход для mapping линий — подтверди что
+       ResizeObserver + scroll listener + requestAnimationFrame подход OK
+- Q15: где хранить resizable widths? Сейчас localStorage (machine-local
+       preference). Альтернатива — в Project JSON (sync через backend).
+       На Sprint 1 нужно решить.
 
-Технологический стек (зафиксирован):
-- Tauri 2 + WebView2
-- React 18 + TypeScript 5 + Vite + Zustand
-- Python 3.11 + lxml + Pydantic v2 (sidecar)
-- JSON-RPC 2.0 over stdio (Rust ↔ Python)
-- JSON files в %APPDATA%\Konvey\Projects\ (без SQLite)
+ЧТО ЖДЁМ ОТ ТЕБЯ:
+1. Подтверди что Sprint 1 plan (mapping engine) можно запускать как
+   планировалось, или нужны коррективы из-за visual foundation
+2. Скорректируй Sprint 1 prompt — Phase D1 (CSS Modules) и Phase A
+   (pre-flight) уже сделаны, можно сократить
+3. Реши Q14 (SVG overlay подход) и Q15 (где хранить widths)
+4. Если будут новые UX-замечания после визуального просмотра —
+   добавь в Sprint 1 prompt
 
-Полный отчёт читай через:
-https://raw.githubusercontent.com/anymasoft/konvey/main/docs/SPRINT_0_REPORT.md
+ЧЕСТНЫЙ REVIEW ОТ ВЛАДЕЛЬЦА (после визуальной проверки):
++ Дизайн в окне теперь близок к мокапу Claude Design
++ Иконки в TreeView, header, sidebar, dock — все на месте
++ Resizable работает плавно, ширины сохраняются между сессиями
++ Header progress block выглядит как в мокапе (бар + counters)
++ Wizard со step checks смотрится профессионально
++ Inspector с object info — полезен и информативен
++ "ED candidate list при failed auto-match" — особо удачная находка,
+  владелец явно отметил
 
-Готов к Sprint 1 после твоего разбора.
+ГОТОВЫ К SPRINT 1 (mapping engine + drag-and-drop + auto-mapping).
 ```
 
 ---
 
 ## Что сделать владельцу
 
-1. Открыть https://claude.ai/new (новая сессия)
-2. Выбрать модель Claude Opus 4.7 Adaptive
-3. Вставить **весь блок выше** (от "Привет!" до "Готов к Sprint 1 после твоего разбора.") как первое сообщение
-4. Подождать пока Opus прочитает все URLs через `raw.githubusercontent.com` и ответит
-5. Передать ответ обратно сюда — переходим к Sprint 1
+1. Открыть https://claude.ai (продолжить ту же сессию с Opus, где он прислал Sprint 1 prompt после Sprint 0)
+2. Вставить **весь блок выше** (от "Привет!" до "Готовы к Sprint 1 ...") как новое сообщение
+3. Подождать пока Opus прочитает все raw URLs через `raw.githubusercontent.com` и подтвердит/скорректирует Sprint 1 prompt
+4. Передать финальный Sprint 1 prompt мне (Claude Code) для исполнения
 
-## Альтернативная подача (если у Opus возникнут проблемы с raw URL)
+## Альтернативная подача
 
-В крайнем случае, если Opus не сможет читать raw.githubusercontent.com, скопируй ему текст SPRINT_0_REPORT.md, DECISIONS.md и QUESTIONS.md прямо в чат. Все три файла короче 30 KB вместе — войдёт в одно сообщение.
+Если у Opus возникнут проблемы с raw.githubusercontent.com (cache, lag) — скопируй ему текст:
+- `SPRINT_05_REPORT.md` (этот файл)
+- `DECISIONS.md` ADR-009 и ADR-010 (новые)
+- `QUESTIONS.md` Q13-Q15 (новые)
+
+Все три файла короче 50 KB вместе — войдут в одно сообщение.

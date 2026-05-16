@@ -90,6 +90,51 @@
 
 ---
 
+## Q13. Учебная база УЦ№1 — статус ожидания
+
+**Контекст:** Opus в Sprint 1 plan ожидает мини-выгрузку из учебной 1С-базы УЦ№1 (УТ + БП) для integration теста auto-mapper'а. Владелец сказал «3-5 дней».
+
+**Текущее состояние:** integration test `test_auto_mapper_integration_uchebnaya.py` будет создан в Sprint 1 с `@pytest.mark.skip("waits for owner's fixture")` до получения базы.
+
+**Вопрос:** ничего блокирующего сейчас. Когда база появится — положу в `backend/tests/fixtures/uchebnaya_ut/` и `uchebnaya_bp/`, сниму skip.
+
+---
+
+## Q14. SVG mapping overlay — подход к синхронизации позиций
+
+**Контекст:** Sprint 1 plan от Opus предлагает SVG-overlay поверх трёх tree-pane для линий маппинга. Линии должны переcчитываться при:
+- resize окна
+- resize колонок (drag dividers)
+- scroll внутри каждой панели
+- expand/collapse групп в TreeView
+- toggle Inspector collapse
+
+**Текущая идея:** `ResizeObserver` на корне MappingArea + scroll listener на каждой панели + `requestAnimationFrame` для batching. Каждый leaf node имеет `data-mapping-anchor-id`, ищем через `document.querySelector('[data-mapping-anchor-id="..."]').getBoundingClientRect()`.
+
+**Concern:** при 200+ маппингах на крупной УП-конфигурации перерасчёт линий каждый scroll может тормозить. Заранее оптимизация (Canvas вместо SVG, viewport culling) — над/недо? Опыт react-flow подсказывает что SVG 200 элементов — OK. Но если есть сомнения — стоит обсудить.
+
+**Вопрос архитектору:** подтверди подход или предложи альтернативу.
+
+---
+
+## Q15. Resizable widths — где хранить (machine-local vs Project-level)
+
+**Контекст:** Sprint 0.5 D14 реализован: ширины колонок и сайдбаров сохраняются в **`localStorage`** (machine-local). При синхронизации проекта через git между двумя машинами — каждая машина будет иметь свой layout.
+
+**Альтернатива:** хранить widths в `Project.ui_preferences` field, sync через backend save_project.
+
+**Pros локально (текущий выбор):**
+- Каждый пользователь привыкает к своему layout, не мешает другому
+- Не загрязняет project JSON (UI state vs project data разнесены)
+
+**Pros в Project:**
+- "Открыл проект на новой машине — увидел тот же layout"
+- Может быть важно если widths становятся "design-level" (Sprint 2+ — например, у объекта `Document.X` пользователь предпочитает 50% width для middle pane)
+
+**Вопрос:** оставляем как есть в Sprint 1 (localStorage) или мигрируем в Project? Если в Project — миграция v2→v3.
+
+---
+
 ## Q8. Anthropic API key — где хранить
 
 **Контекст:** Sprint 0 не интегрирует Anthropic API. Но архитектурно — где хранить API key пользователя на disk? Plain text JSON в %APPDATA% — небезопасно.

@@ -18,7 +18,7 @@ Three-party workflow documented in `docs/PROCESS.md`:
 
 Each sprint produces `docs/SPRINT_N_REPORT.md` and updates `docs/QUESTIONS.md` (numbered Q1, Q2, ...). All architectural decisions go to `docs/DECISIONS.md` as ADR-NNN records.
 
-**Current state:** Sprint 0 closed (vertical slice verified, ADR-007). Sprint 0.5 "Visual Foundation" in progress — Iter 1 (models v2 + check-env) shipped, Iter 2-5 pending.
+**Current state:** Sprint 0 + Sprint 0.5 closed. Vertical slice verified (ADR-007). UI foundation done: CSS Modules everywhere (ADR-009), 36 inline SVG icons (ADR-010), resizable columns + sidebars, header progress visualization, Inspector with object-state, Wizard step checks. Mapping engine (drag-and-drop lines, auto-mapping, Inspector mapping details) is the Sprint 1 scope.
 
 When starting work, read in order: `docs/SPRINT_0_REPORT.md` → most recent SPRINT_*_REPORT → `docs/DECISIONS.md` → `docs/QUESTIONS.md` → the current sprint's prompt from the owner.
 
