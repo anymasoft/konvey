@@ -7,14 +7,21 @@
 # sidecar.rs logic — it checks KONVEY_SIDECAR_MODE env var and runs
 # `python -m konvey_backend` from backend/.venv when set to "dev".
 #
+# This script ALSO loads MSVC Build Tools environment (required for `cargo build`
+# to find link.exe on Windows). See scripts\msvc-env.ps1 for details.
+#
 
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Resolve-Path "$PSScriptRoot\.."
 
-# Ensure backend venv exists
+# Step 1: Load MSVC environment (PATH/INCLUDE/LIB for link.exe)
+. "$PSScriptRoot\msvc-env.ps1"
+
+# Step 2: Ensure backend venv exists
 $VenvPython = "$RepoRoot\backend\.venv\Scripts\python.exe"
 if (-not (Test-Path $VenvPython)) {
+    Write-Host ""
     Write-Host "Backend venv not found. Creating and installing..."
     Push-Location "$RepoRoot\backend"
     python -m venv .venv
@@ -23,17 +30,17 @@ if (-not (Test-Path $VenvPython)) {
     Pop-Location
 }
 
-# Tell sidecar.rs to use dev mode
+# Step 3: Tell sidecar.rs to use dev mode
 $env:KONVEY_SIDECAR_MODE = "dev"
-
-# Tell sidecar to use venv python explicitly (avoid system python issues)
 $env:KONVEY_SIDECAR_PYTHON = $VenvPython
 
 Push-Location $RepoRoot
 try {
+    Write-Host ""
     Write-Host "Starting Konvey in dev mode..."
     Write-Host "  KONVEY_SIDECAR_MODE = $env:KONVEY_SIDECAR_MODE"
     Write-Host "  KONVEY_SIDECAR_PYTHON = $env:KONVEY_SIDECAR_PYTHON"
+    Write-Host ""
     npm run tauri dev
 }
 finally {
