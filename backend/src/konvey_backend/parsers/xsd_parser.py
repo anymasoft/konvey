@@ -197,7 +197,10 @@ def parse_xsd(path: str | Path) -> EnterpriseDataSchema:
 
     return EnterpriseDataSchema(
         version=version,
-        namespace=target_namespace,
+        primary_namespace=target_namespace,
+        # Sprint 0.5: extension_namespaces left empty.
+        # Sprint 2 will resolve xs:import directives and populate this.
+        extension_namespaces=[],
         simple_types=simple_types,
         complex_types=complex_types,
     )

@@ -13,6 +13,7 @@ For testing, the directory can be overridden via env KONVEY_PROJECTS_DIR.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 import uuid
@@ -21,9 +22,55 @@ from pathlib import Path
 
 from konvey_backend.models.configuration import Configuration
 from konvey_backend.models.enterprise_data import EnterpriseDataSchema
-from konvey_backend.models.project import NewProjectData, Project, ProjectSummary
+from konvey_backend.models.project import (
+    CURRENT_PROJECT_SCHEMA_VERSION,
+    NewProjectData,
+    Project,
+    ProjectSummary,
+)
 from konvey_backend.parsers.config_parser import parse_configuration
 from konvey_backend.parsers.xsd_parser import parse_xsd
+
+log = logging.getLogger(__name__)
+
+
+def migrate_project_dict(data: dict) -> dict:
+    """Migrate a project dict from an older schema version to CURRENT_PROJECT_SCHEMA_VERSION.
+
+    Idempotent: calling on an already-current dict is a no-op.
+
+    Migrations applied:
+      v1 -> v2: add `schema_version=2`, ensure `mappings=[]`, ensure
+                `enterprise_data.primary_namespace` (renamed from `namespace`),
+                ensure `enterprise_data.extension_namespaces=[]`.
+    """
+    current = data.get("schema_version", 1)
+
+    if current >= CURRENT_PROJECT_SCHEMA_VERSION:
+        return data
+
+    # v1 -> v2
+    if current == 1:
+        log.info(
+            "Migrating project %s from schema v1 to v2",
+            data.get("id", "<unknown>"),
+        )
+        if "mappings" not in data:
+            data["mappings"] = []
+        if "enterprise_data" in data and isinstance(data["enterprise_data"], dict):
+            ed = data["enterprise_data"]
+            # Rename `namespace` -> `primary_namespace` if v1 schema used the old name.
+            if "primary_namespace" not in ed and "namespace" in ed:
+                ed["primary_namespace"] = ed["namespace"]
+            if "extension_namespaces" not in ed:
+                ed["extension_namespaces"] = []
+        data["schema_version"] = 2
+        current = 2
+
+    # Future migrations slot in here:
+    # if current == 2: ... -> 3
+
+    return data
 
 
 def projects_dir() -> Path:
@@ -62,6 +109,7 @@ def list_projects() -> list[ProjectSummary]:
                 data = json.load(fp)
             # Build summary directly from JSON without instantiating full Project
             # (avoids re-validating large EnterpriseDataSchema for every entry)
+            # No migration needed for summary - we only read top-level fields.
             out.append(
                 ProjectSummary(
                     id=data["id"],
@@ -72,8 +120,10 @@ def list_projects() -> list[ProjectSummary]:
                     ed_version=data.get("enterprise_data", {}).get("version"),
                     created_at=datetime.fromisoformat(data["created_at"]),
                     updated_at=datetime.fromisoformat(data["updated_at"]),
-                    mapped_count=0,  # Sprint 0
+                    # Sprint 0.5: mapping counts still 0 - mapping engine in Sprint 1.
+                    mapped_count=len(data.get("mappings", [])),
                     total_pcr_count=0,
+                    unresolved_count=0,
                 )
             )
         except (json.JSONDecodeError, KeyError, ValueError):
@@ -86,12 +136,13 @@ def list_projects() -> list[ProjectSummary]:
 
 
 def load_project(project_id: str) -> Project:
-    """Load full Project by id."""
+    """Load full Project by id, applying schema migrations if needed."""
     p = _project_path(project_id)
     if not p.exists():
         raise FileNotFoundError(f"Project not found: {project_id}")
     with p.open(encoding="utf-8") as fp:
         data = json.load(fp)
+    data = migrate_project_dict(data)
     return Project.model_validate(data)
 
 

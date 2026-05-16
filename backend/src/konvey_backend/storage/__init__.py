@@ -5,6 +5,7 @@ from konvey_backend.storage.project_storage import (
     delete_project,
     list_projects,
     load_project,
+    migrate_project_dict,
     projects_dir,
     save_project,
 )
@@ -14,6 +15,7 @@ __all__ = [
     "delete_project",
     "list_projects",
     "load_project",
+    "migrate_project_dict",
     "projects_dir",
     "save_project",
 ]
