@@ -1,23 +1,72 @@
-/* Supplementary classes used by Konvey React components, in addition to konvey-design.css */
+/*
+ * extra.css — supplementary styles for Konvey components.
+ *
+ * Loaded AFTER global.css (= konvey-design.css from Claude Design).
+ * Adds:
+ *   - @import for IBM Plex font (Google Fonts) — required, otherwise falls back to Segoe UI
+ *   - Form primitives (.k-input, .k-field, .k-label) not covered by global.css
+ *   - Radio/checkbox restyles
+ *   - Reset for html/body
+ */
 
-.k-input {
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: var(--k-font-sans);
-  font-size: 12px;
-  padding: 6px 8px;
+  background: var(--k-bg);
+  color: var(--k-text);
+  font-size: 12.5px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
+}
+
+* { box-sizing: border-box; }
+
+/* === Form primitives === */
+
+.k-input,
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+textarea,
+select {
+  font-family: var(--k-font-sans);
+  font-size: 12.5px;
+  padding: 6px 10px;
   background: var(--k-panel);
   color: var(--k-text);
   border: 1px solid var(--k-border-strong);
   border-radius: var(--k-radius);
   outline: none;
-  transition: border-color 120ms;
+  transition: border-color 120ms, box-shadow 120ms;
+  height: 32px;
 }
 
-.k-input:focus {
+textarea {
+  height: auto;
+  padding: 8px 10px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.k-input:focus,
+input:focus,
+textarea:focus,
+select:focus {
   border-color: var(--k-accent);
-  box-shadow: 0 0 0 2px var(--k-accent-50);
+  box-shadow: 0 0 0 3px var(--k-accent-50);
 }
 
-.k-input:disabled {
+.k-input:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
   background: var(--k-panel-sunk);
   color: var(--k-text-4);
   cursor: not-allowed;
@@ -26,34 +75,174 @@
 .k-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  margin-bottom: 4px;
 }
 
 .k-label {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--k-text-2);
+  letter-spacing: 0;
 }
 
 .k-hint {
   font-size: 11px;
   color: var(--k-text-3);
+  line-height: 1.4;
 }
 
-/* Tree view leaf */
-.k-tree-leaf {
-  padding: 2px 0;
-  color: var(--k-text);
+/* === Radio / Checkbox === */
+
+input[type="radio"],
+input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  accent-color: var(--k-accent);
+  cursor: pointer;
+  vertical-align: middle;
 }
 
-/* Ensure body uses our app font and bg */
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+input[type="radio"]:disabled,
+input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+label {
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+/* === Buttons (fallback in case .k-btn from global.css doesn't fully match) === */
+
+.k-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 14px;
   font-family: var(--k-font-sans);
-  background: var(--k-bg);
+  font-size: 12.5px;
+  font-weight: 500;
   color: var(--k-text);
+  background: var(--k-panel);
+  border: 1px solid var(--k-border-strong);
+  border-radius: var(--k-radius);
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
-* { box-sizing: border-box; }
+.k-btn:hover:not(:disabled) {
+  background: var(--k-panel-sunk);
+  border-color: var(--k-text-4);
+}
+
+.k-btn:active:not(:disabled) {
+  background: var(--k-border);
+}
+
+.k-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.k-btn.primary {
+  background: var(--k-accent);
+  border-color: var(--k-accent);
+  color: white;
+}
+
+.k-btn.primary:hover:not(:disabled) {
+  background: #2247c2;
+  border-color: #2247c2;
+}
+
+.k-btn.ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.k-btn.ghost:hover:not(:disabled) {
+  background: var(--k-panel-sunk);
+}
+
+/* === Tree view leaf === */
+.k-tree-leaf {
+  padding: 2px 4px;
+  color: var(--k-text);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.k-tree-leaf:hover {
+  background: var(--k-panel-sunk);
+}
+
+/* === Details/summary (used in tree views) === */
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  padding: 3px 4px;
+  border-radius: 2px;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary::before {
+  content: "▶";
+  display: inline-block;
+  width: 12px;
+  font-size: 9px;
+  color: var(--k-text-3);
+  transition: transform 100ms;
+  margin-right: 4px;
+}
+
+details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+details > summary:hover {
+  background: var(--k-panel-sunk);
+}
+
+/* === Scrollbars (subtle) === */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--k-panel-sunk);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--k-border-strong);
+  border-radius: 5px;
+  border: 2px solid var(--k-panel-sunk);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--k-text-4);
+}
+
+/* === Selection === */
+::selection {
+  background: var(--k-accent-50);
+  color: var(--k-accent-text);
+}
