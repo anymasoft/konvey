@@ -1,0 +1,58 @@
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/Cargo.lock
+src-tauri/gen/
+
+# PyInstaller output
+src-tauri/binaries/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+backend/build/
+backend/dist/
+*.spec
+
+# Large fixtures (XSD files >700 KB, BSL example 9.7 MB)
+# Включаем в репо для full reproducibility — экспериментально.
+# Если репо станет тяжёлым — раскомментировать:
+# backend/tests/fixtures/EnterpriseData_*.xsd
+# examples/bsl/*.bsl
+
+# IDE
+.vscode/launch.json
+.vscode/.ropeproject
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test outputs
+coverage/
+.nyc_output/
+test-results/
+
+# Logs
+*.log
+logs/
+
+# Local config (если появится)
+.env
+.env.local
