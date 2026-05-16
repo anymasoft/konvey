@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Configuration } from "@/types/configuration";
 import type { WizardState } from "./Wizard";
+import styles from "./Wizard.module.css";
 
 interface Props {
   state: WizardState;
@@ -42,81 +43,47 @@ export function Step4Objects({ state, update }: Props) {
   const selectedCount = state.selectedObjects.length;
 
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-      <h2 style={{ margin: 0, fontSize: 16, marginBottom: 8 }}>Объекты для обмена</h2>
-      <p style={{ fontSize: 12, color: "var(--k-text-3)", marginBottom: 16 }}>
+    <div className={styles.stepBodyWide}>
+      <h2 className={styles.stepTitle} style={{ marginBottom: 8 }}>
+        Объекты для обмена
+      </h2>
+      <p className={styles.stepDescription} style={{ marginBottom: 16 }}>
         Отметьте объекты, которые должны участвовать в обмене. В Sprint 0 поддержано простое
         выделение без auto-resolve зависимостей — нужные справочники добавьте вручную.
       </p>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <div className={styles.sideTabs}>
         <button
           onClick={() => setActiveSide("source")}
-          className={activeSide === "source" ? "k-btn k-btn-primary" : "k-btn"}
+          className={activeSide === "source" ? "k-btn primary" : "k-btn"}
         >
           Источник: {state.sourceResult?.configuration.name ?? "—"}
         </button>
         <button
           onClick={() => setActiveSide("target")}
-          className={activeSide === "target" ? "k-btn k-btn-primary" : "k-btn"}
+          className={activeSide === "target" ? "k-btn primary" : "k-btn"}
         >
           Приёмник: {state.targetResult?.configuration.name ?? "—"}
         </button>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 320px",
-          gap: 16,
-          height: "calc(100vh - 320px)",
-        }}
-      >
-        <div
-          style={{
-            background: "var(--k-panel)",
-            border: "1px solid var(--k-border)",
-            borderRadius: "var(--k-radius-md)",
-            overflow: "auto",
-            padding: 8,
-          }}
-        >
+      <div className={styles.step4Layout}>
+        <div className={styles.objectTreePanel}>
           {Object.entries(grouped).map(([type, objects]) => (
-            <details key={type} open>
-              <summary
-                style={{
-                  cursor: "pointer",
-                  padding: "4px 8px",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "var(--k-text-2)",
-                }}
-              >
+            <details key={type} open className={styles.typeGroup}>
+              <summary>
                 {type} ({objects.length})
               </summary>
-              <ul style={{ listStyle: "none", padding: "0 0 0 16px", margin: 0 }}>
+              <ul className={styles.typeGroupList}>
                 {objects.map((obj) => (
-                  <li
-                    key={obj.full_name}
-                    style={{
-                      padding: "2px 4px",
-                      fontSize: 12,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
+                  <li key={obj.full_name} className={styles.typeGroupItem}>
                     <input
                       type="checkbox"
                       checked={state.selectedObjects.includes(obj.full_name)}
                       onChange={() => toggle(obj.full_name)}
                     />
                     <span>{obj.name}</span>
-                    {obj.synonym && (
-                      <span style={{ color: "var(--k-text-3)", fontSize: 11 }}>
-                        — {obj.synonym}
-                      </span>
-                    )}
+                    {obj.synonym && <span className="synonym">— {obj.synonym}</span>}
                   </li>
                 ))}
               </ul>
@@ -124,32 +91,14 @@ export function Step4Objects({ state, update }: Props) {
           ))}
         </div>
 
-        <aside
-          style={{
-            background: "var(--k-panel)",
-            border: "1px solid var(--k-border)",
-            borderRadius: "var(--k-radius-md)",
-            padding: 12,
-            overflow: "auto",
-          }}
-        >
-          <div style={{ fontWeight: 600, fontSize: 12, marginBottom: 8 }}>
-            Выбрано ({selectedCount})
-          </div>
+        <aside className={styles.selectedList}>
+          <div className={styles.selectedHeader}>Выбрано ({selectedCount})</div>
           {selectedCount === 0 ? (
-            <div style={{ fontSize: 11, color: "var(--k-text-3)" }}>
-              Никаких объектов не выбрано.
-            </div>
+            <div className={styles.selectedEmpty}>Никаких объектов не выбрано.</div>
           ) : (
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 12 }}>
+            <ul className={styles.selectedItems}>
               {state.selectedObjects.map((n) => (
-                <li
-                  key={n}
-                  style={{
-                    padding: "3px 0",
-                    borderBottom: "1px solid var(--k-divider)",
-                  }}
-                >
+                <li key={n} className={styles.selectedItem}>
                   {n}
                 </li>
               ))}

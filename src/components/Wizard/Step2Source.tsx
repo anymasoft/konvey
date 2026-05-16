@@ -2,6 +2,7 @@ import { useState } from "react";
 import { backend } from "@/api/backend";
 import { FilePicker } from "../common/FilePicker";
 import type { WizardState } from "./Wizard";
+import styles from "./Wizard.module.css";
 
 interface Props {
   state: WizardState;
@@ -27,25 +28,25 @@ export function Step2Source({ state, update }: Props) {
   };
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
-      <h2 style={{ margin: 0, fontSize: 16 }}>Конфигурация-источник</h2>
-      <p style={{ margin: 0, fontSize: 12, color: "var(--k-text-3)" }}>
+    <div className={styles.stepBody}>
+      <h2 className={styles.stepTitle}>Конфигурация-источник</h2>
+      <p className={styles.stepDescription}>
         Откуда выгружаются данные. Например, рабочая база УТ или ERP.
       </p>
 
       <div className="k-field">
         <label className="k-label">Способ подачи</label>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12 }}>
+        <div className={styles.modeChoices}>
           <label>
             <input type="radio" name="src-mode" defaultChecked /> Папка с выгрузкой XML конфигурации
           </label>
-          <label style={{ color: "var(--k-text-4)" }}>
-            <input type="radio" name="src-mode" disabled /> Подключиться к работающей базе 1С{" "}
-            <span style={{ fontStyle: "italic" }}>(в следующих релизах)</span>
+          <label className={styles.disabledChoice}>
+            <input type="radio" name="src-mode" disabled /> Подключиться к работающей базе 1С
+            <em>(в следующих релизах)</em>
           </label>
-          <label style={{ color: "var(--k-text-4)" }}>
-            <input type="radio" name="src-mode" disabled /> Загрузить ранее распарсенный JSON{" "}
-            <span style={{ fontStyle: "italic" }}>(в следующих релизах)</span>
+          <label className={styles.disabledChoice}>
+            <input type="radio" name="src-mode" disabled /> Загрузить ранее распарсенный JSON
+            <em>(в следующих релизах)</em>
           </label>
         </div>
       </div>
@@ -58,42 +59,30 @@ export function Step2Source({ state, update }: Props) {
           disabled={parsing}
         />
         {state.sourcePath && (
-          <div style={{ fontSize: 11, color: "var(--k-text-3)", marginTop: 4 }}>
-            Папка: <span className="k-mono">{state.sourcePath}</span>
+          <div className={styles.fileHint}>
+            Папка: <span className={styles.pathMono}>{state.sourcePath}</span>
           </div>
         )}
         {parsing && (
-          <div style={{ fontSize: 12, color: "var(--k-text-3)", marginTop: 8 }}>
+          <div className={styles.parsingMessage}>
             Парсинг конфигурации (может занять до 30 сек)...
           </div>
         )}
-        {error && (
-          <div style={{ fontSize: 12, color: "var(--k-red)", marginTop: 8 }}>{error}</div>
-        )}
+        {error && <div className={styles.errorMessage}>{error}</div>}
         {state.sourceResult && (
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--k-text-2)",
-              marginTop: 8,
-              padding: 8,
-              background: "var(--k-panel-sunk)",
-              borderRadius: "var(--k-radius)",
-            }}
-          >
-            <div style={{ fontWeight: 500 }}>
+          <div className={styles.parseResult}>
+            <div className={styles.parseResultName}>
               {state.sourceResult.configuration.name}
               {state.sourceResult.configuration.version && (
-                <span style={{ color: "var(--k-text-3)" }}>
-                  {" "}
-                  ({state.sourceResult.configuration.version})
+                <span className={styles.parseResultDim}>
+                  {" "}({state.sourceResult.configuration.version})
                 </span>
               )}
             </div>
-            <div style={{ marginTop: 4, color: "var(--k-text-3)" }}>
+            <div className={styles.parseResultDim} style={{ marginTop: 4 }}>
               Всего объектов: {state.sourceResult.summary.total}
             </div>
-            <div style={{ marginTop: 2, fontSize: 11 }}>
+            <div className={styles.parseResultBreakdown}>
               {Object.entries(state.sourceResult.summary)
                 .filter(([k]) => k.startsWith("type_"))
                 .map(([k, v]) => `${k.replace("type_", "")}: ${v}`)

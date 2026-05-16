@@ -3,6 +3,7 @@
  */
 import type { ProjectSummary } from "@/types/project";
 import { ProgressBar } from "../common/ProgressBar";
+import styles from "./ProjectCard.module.css";
 
 interface Props {
   project: ProjectSummary;
@@ -37,25 +38,14 @@ export function ProjectCard({ project, onOpen }: Props) {
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onOpen();
       }}
-      style={{
-        background: "var(--k-panel)",
-        border: "1px solid var(--k-border)",
-        borderRadius: "var(--k-radius-md)",
-        padding: 16,
-        cursor: "pointer",
-        boxShadow: "var(--k-shadow-sm)",
-      }}
+      className={styles.card}
     >
-      <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{project.name}</div>
-      <div style={{ fontSize: 12, color: "var(--k-text-3)", marginBottom: 4 }}>
-        {src} → {tgt}
+      <div className={styles.name}>{project.name}</div>
+      <div className={styles.flow}>
+        {src} <span className={styles.flowArrow}>→</span> {tgt}
       </div>
-      <div style={{ fontSize: 11, color: "var(--k-text-3)", marginBottom: 12 }}>
-        EnterpriseData {ed}
-      </div>
-      <div style={{ fontSize: 11, color: "var(--k-text-3)", marginBottom: 8 }}>
-        Изменён: {formatDate(project.updated_at)}
-      </div>
+      <div className={styles.edVersion}>EnterpriseData {ed}</div>
+      <div className={styles.date}>Изменён: {formatDate(project.updated_at)}</div>
       <ProgressBar value={project.mapped_count} max={project.total_pcr_count || 1} showLabel />
     </div>
   );

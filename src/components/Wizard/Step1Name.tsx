@@ -3,6 +3,7 @@ import { backend } from "@/api/backend";
 import { Input } from "../common/Input";
 import { FilePicker } from "../common/FilePicker";
 import type { WizardState } from "./Wizard";
+import styles from "./Wizard.module.css";
 
 interface Props {
   state: WizardState;
@@ -28,8 +29,8 @@ export function Step1Name({ state, update }: Props) {
   };
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
-      <h2 style={{ margin: 0, fontSize: 16 }}>Имя проекта и стандарт EnterpriseData</h2>
+    <div className={styles.stepBody}>
+      <h2 className={styles.stepTitle}>Имя проекта и стандарт EnterpriseData</h2>
 
       <Input
         id="proj-name"
@@ -51,7 +52,7 @@ export function Step1Name({ state, update }: Props) {
 
       <div className="k-field">
         <label className="k-label">Формат правил</label>
-        <div style={{ display: "flex", gap: 16, fontSize: 12 }}>
+        <div className={styles.inlineChoices}>
           <label>
             <input
               type="radio"
@@ -62,10 +63,9 @@ export function Step1Name({ state, update }: Props) {
             />{" "}
             КД 3.1 / EnterpriseData
           </label>
-          <label style={{ color: "var(--k-text-4)" }}>
-            <input type="radio" name="format" value="kd2" disabled />{" "}
-            КД 2.1 / Legacy{" "}
-            <span style={{ fontStyle: "italic" }}>(в следующих релизах)</span>
+          <label className={styles.disabledChoice}>
+            <input type="radio" name="format" value="kd2" disabled /> КД 2.1 / Legacy
+            <em>(в следующих релизах)</em>
           </label>
         </div>
       </div>
@@ -80,29 +80,14 @@ export function Step1Name({ state, update }: Props) {
           disabled={parsing}
         />
         {state.xsdPath && (
-          <div style={{ fontSize: 11, color: "var(--k-text-3)", marginTop: 4 }}>
-            Файл: <span className="k-mono">{state.xsdPath}</span>
+          <div className={styles.fileHint}>
+            Файл: <span className={styles.pathMono}>{state.xsdPath}</span>
           </div>
         )}
-        {parsing && (
-          <div style={{ fontSize: 12, color: "var(--k-text-3)", marginTop: 8 }}>
-            Парсинг XSD...
-          </div>
-        )}
-        {error && (
-          <div style={{ fontSize: 12, color: "var(--k-red)", marginTop: 8 }}>{error}</div>
-        )}
+        {parsing && <div className={styles.parsingMessage}>Парсинг XSD...</div>}
+        {error && <div className={styles.errorMessage}>{error}</div>}
         {state.xsdResult && (
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--k-text-2)",
-              marginTop: 8,
-              padding: 8,
-              background: "var(--k-panel-sunk)",
-              borderRadius: "var(--k-radius)",
-            }}
-          >
+          <div className={styles.parseResult}>
             EnterpriseData {state.xsdResult.schema.version}:{" "}
             {state.xsdResult.summary.total_complex} типов объектов,{" "}
             {state.xsdResult.summary.total_simple} простых типов

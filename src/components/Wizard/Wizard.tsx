@@ -1,11 +1,11 @@
 /**
- * NewProjectWizard — 4 steps:
+ * NewProjectWizard - 4 steps:
  *  1. Name + EnterpriseData XSD version
  *  2. Source configuration (folder dump)
  *  3. Target configuration (folder dump)
  *  4. Select objects to exchange
  *
- * State is local (not in store) — wizard is throw-away if canceled.
+ * State is local (not in store) - wizard is throw-away if canceled.
  */
 import { useState } from "react";
 import { backend } from "@/api/backend";
@@ -17,11 +17,12 @@ import { Step1Name } from "./Step1Name";
 import { Step2Source } from "./Step2Source";
 import { Step3Target } from "./Step3Target";
 import { Step4Objects } from "./Step4Objects";
+import styles from "./Wizard.module.css";
 
 export interface WizardState {
   name: string;
   description: string;
-  format: "kd3" | "kd2";  // kd2 is disabled in Sprint 0
+  format: "kd3" | "kd2"; // kd2 is disabled in Sprint 0
   xsdPath: string;
   xsdResult: XsdParseResult | null;
 
@@ -97,71 +98,34 @@ export function Wizard() {
   };
 
   return (
-    <div
-      style={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--k-bg)",
-      }}
-    >
-      <header
-        style={{
-          padding: "16px 24px",
-          borderBottom: "1px solid var(--k-border)",
-          background: "var(--k-panel)",
-        }}
-      >
-        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>Новый проект Konvey</div>
-        <div style={{ display: "flex", gap: 8 }}>
+    <div className={styles.root}>
+      <header className={styles.header}>
+        <div className={styles.title}>Новый проект Konvey</div>
+        <div className={styles.steps}>
           {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
-              style={{
-                flex: 1,
-                height: 4,
-                background: s <= step ? "var(--k-accent)" : "var(--k-border)",
-                borderRadius: 2,
-              }}
+              className={`${styles.stepIndicator} ${s <= step ? styles.stepIndicatorActive : ""}`}
             />
           ))}
         </div>
-        <div style={{ fontSize: 11, color: "var(--k-text-3)", marginTop: 6 }}>
-          Шаг {step} из 4
-        </div>
+        <div className={styles.stepLabel}>Шаг {step} из 4</div>
       </header>
 
-      <main style={{ flex: 1, overflow: "auto", padding: 24 }}>
+      <main className={styles.main}>
         {step === 1 && <Step1Name state={state} update={update} />}
         {step === 2 && <Step2Source state={state} update={update} />}
         {step === 3 && <Step3Target state={state} update={update} />}
         {step === 4 && <Step4Objects state={state} update={update} />}
       </main>
 
-      {error && (
-        <div
-          style={{
-            padding: "8px 24px",
-            background: "var(--k-red-bg)",
-            color: "var(--k-red)",
-            fontSize: 12,
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <div className={styles.errorBanner}>{error}</div>}
 
-      <footer
-        style={{
-          padding: 16,
-          borderTop: "1px solid var(--k-border)",
-          background: "var(--k-panel)",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <Button variant="ghost" onClick={handleCancel}>Отмена</Button>
-        <div style={{ display: "flex", gap: 8 }}>
+      <footer className={styles.footer}>
+        <Button variant="ghost" onClick={handleCancel}>
+          Отмена
+        </Button>
+        <div className={styles.footerActions}>
           <Button
             variant="secondary"
             onClick={() => setStep((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3 | 4) : s))}
