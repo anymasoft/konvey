@@ -74,6 +74,16 @@ Visibility: Public — читай через raw.githubusercontent.com без к
    - Right Inspector с контекстом по выбранному маппингу?
    - Сохранение mappings в Project JSON?
 3. Приоритет тестового кейса: УТ↔БП vs ERP↔БП vs что-то иное?
+4. Sprint 1.5 "Design Pass" — отдельный спринт ИЛИ часть Sprint 1?
+   Sprint 0 имеет ТЕХНИЧЕСКИЙ ДОЛГ по UI: компоненты используют inline styles
+   вместо классов из konvey-design.css. Визуально результат СИЛЬНО отличается
+   от мокапов Claude Design. Что от тебя нужно: решить — выделять отдельный
+   "Design Pass" спринт между Sprint 1 и Sprint 2 (рекомендую), или вкатить
+   полировку UI параллельно с Sprint 1.
+   Конкретно требует: переписать ProjectPicker/Wizard/Workspace компоненты с
+   полным использованием .k-* классов из global.css, добавить SVG-иконки,
+   привести spacing/typography к мокапам, использовать готовые компоненты
+   из examples/design/konvey-screens.jsx как референс.
 
 Структура репозитория (для контекста):
 - docs/                  — 6 .md документов (PROCESS, DECISIONS, QUESTIONS, REFERENCE_TOPICS, GITHUB_SETUP, SPRINT_0_REPORT)
