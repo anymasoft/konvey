@@ -17,6 +17,8 @@ use serde_json::{json, Value};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, ChildStdin, Command};
 use tokio::sync::{oneshot, Mutex};
+// stdin shutdown trait
+use tokio::io::AsyncWrite;
 
 /// Pending requests keyed by JSON-RPC id, waiting for stdout response.
 type PendingMap = Arc<Mutex<HashMap<u64, oneshot::Sender<Value>>>>;

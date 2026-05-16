@@ -50,7 +50,6 @@ pub fn run() {
         .manage(SidecarState(Mutex::new(None)))
         .setup(|app| {
             // Start sidecar on app launch
-            let state = app.state::<SidecarState>();
             let handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 let state = handle.state::<SidecarState>();
