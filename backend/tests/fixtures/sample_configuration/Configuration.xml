@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses">
+  <Configuration>
+    <Properties>
+      <Name>УчебнаяКонфигурация</Name>
+      <Synonym>
+        <content>Учебная конфигурация для тестов Konvey</content>
+      </Synonym>
+      <Version>1.0.0.1</Version>
+      <Vendor>Konvey Test</Vendor>
+    </Properties>
+    <ChildObjects>
+      <Catalog>Контрагенты</Catalog>
+      <Document>РеализацияТоваровУслуг</Document>
+      <Enum>ВидыКонтрагентов</Enum>
+    </ChildObjects>
+  </Configuration>
+</MetaDataObject>

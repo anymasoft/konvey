@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://v8.1c.ru/edi/edi_stnd/EnterpriseData/1.8"
+    targetNamespace="http://v8.1c.ru/edi/edi_stnd/EnterpriseData/1.8"
+    elementFormDefault="qualified">
+
+  <!-- Base simple type -->
+  <xs:simpleType name="Идентификатор">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="36"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Enum simple type -->
+  <xs:simpleType name="ВидКонтрагента">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ЮридическоеЛицо"/>
+      <xs:enumeration value="ФизическоеЛицо"/>
+      <xs:enumeration value="ИндивидуальныйПредприниматель"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Base object complex type -->
+  <xs:complexType name="Object">
+    <xs:sequence>
+      <xs:element name="Ссылка" type="tns:Идентификатор" minOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Composite key type for references -->
+  <xs:complexType name="КлючевыеСвойстваКонтрагент">
+    <xs:annotation>
+      <xs:documentation>Ключевые свойства контрагента: GUID, ИНН, КПП, наименование.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="GUID" type="xs:string" minOccurs="0"/>
+      <xs:element name="ИНН" type="xs:string" minOccurs="0"/>
+      <xs:element name="КПП" type="xs:string" minOccurs="0"/>
+      <xs:element name="Наименование" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Catalog: Контрагенты -->
+  <xs:complexType name="Справочник.Контрагенты">
+    <xs:complexContent>
+      <xs:extension base="tns:Object">
+        <xs:sequence>
+          <xs:element name="Наименование" type="xs:string" minOccurs="1"/>
+          <xs:element name="ИНН" type="xs:string" minOccurs="0"/>
+          <xs:element name="КПП" type="xs:string" minOccurs="0"/>
+          <xs:element name="Вид" type="tns:ВидКонтрагента" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Catalog: Номенклатура -->
+  <xs:complexType name="Справочник.Номенклатура">
+    <xs:complexContent>
+      <xs:extension base="tns:Object">
+        <xs:sequence>
+          <xs:element name="Наименование" type="xs:string"/>
+          <xs:element name="Артикул" type="xs:string" minOccurs="0"/>
+          <xs:element name="ЕдиницаИзмерения" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Document tabular section row -->
+  <xs:complexType name="Документ.РеализацияТоваровУслуг.Товары.Строка">
+    <xs:sequence>
+      <xs:element name="Номенклатура" type="tns:КлючевыеСвойстваНоменклатура" minOccurs="1"/>
+      <xs:element name="Количество" type="xs:decimal"/>
+      <xs:element name="Цена" type="xs:decimal"/>
+      <xs:element name="Сумма" type="xs:decimal"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Document tabular section -->
+  <xs:complexType name="Документ.РеализацияТоваровУслуг.Товары">
+    <xs:sequence>
+      <xs:element name="Строка" type="tns:Документ.РеализацияТоваровУслуг.Товары.Строка" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Document -->
+  <xs:complexType name="Документ.РеализацияТоваровУслуг">
+    <xs:complexContent>
+      <xs:extension base="tns:Object">
+        <xs:sequence>
+          <xs:element name="Номер" type="xs:string"/>
+          <xs:element name="Дата" type="xs:dateTime"/>
+          <xs:element name="Контрагент" type="tns:КлючевыеСвойстваКонтрагент"/>
+          <xs:element name="Сумма" type="xs:decimal"/>
+          <xs:element name="Товары" type="tns:Документ.РеализацияТоваровУслуг.Товары"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Placeholder for Номенклатура composite (used by Товары row) -->
+  <xs:complexType name="КлючевыеСвойстваНоменклатура">
+    <xs:sequence>
+      <xs:element name="GUID" type="xs:string" minOccurs="0"/>
+      <xs:element name="Наименование" type="xs:string" minOccurs="0"/>
+      <xs:element name="Артикул" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

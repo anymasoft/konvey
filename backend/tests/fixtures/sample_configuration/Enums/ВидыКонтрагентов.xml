@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses">
+  <Enum>
+    <Properties>
+      <Name>ВидыКонтрагентов</Name>
+      <Synonym>
+        <content>Виды контрагентов</content>
+      </Synonym>
+    </Properties>
+    <ChildObjects>
+      <EnumValue>
+        <Properties>
+          <Name>ЮридическоеЛицо</Name>
+        </Properties>
+      </EnumValue>
+      <EnumValue>
+        <Properties>
+          <Name>ФизическоеЛицо</Name>
+        </Properties>
+      </EnumValue>
+      <EnumValue>
+        <Properties>
+          <Name>ИндивидуальныйПредприниматель</Name>
+        </Properties>
+      </EnumValue>
+    </ChildObjects>
+  </Enum>
+</MetaDataObject>
