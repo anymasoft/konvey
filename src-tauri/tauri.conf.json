@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Konvey",
+  "version": "0.1.0",
+  "identifier": "pro.konvey.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Konvey",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "center": true,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi"],
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "binaries/konvey-backend"
+    ],
+    "windows": {
+      "wix": {
+        "language": ["en-US", "ru-RU"]
+      }
+    }
+  },
+  "plugins": {}
+}
