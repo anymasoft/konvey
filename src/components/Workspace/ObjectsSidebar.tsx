@@ -2,11 +2,11 @@
  * Left sidebar of Workspace — list of objects selected for exchange,
  * grouped by metadata type. Click to select an object → activates Center.
  *
- * Width is resizable via the divider on the right edge of the sidebar.
- * Width persisted in localStorage (key: konvey.workspace.sidebarWidth).
+ * Width is resizable via the divider on the right edge.
  */
 import { useMemo, useState } from "react";
 import { useProjectStore } from "@/stores/projectStore";
+import { Icon, iconNameForObjectType } from "@/components/icons";
 import { useColumnResize } from "./useColumnResize";
 import styles from "./Workspace.module.css";
 
@@ -43,13 +43,13 @@ export function ObjectsSidebar() {
     <>
       <aside className={styles.sidebar} style={{ width: `${width}px` }}>
         <div className={styles.sidebarSearch}>
+          <Icon name="search" size={12} className={styles.sidebarSearchIcon} />
           <input
-            className="k-input"
+            className={`k-input ${styles.sidebarSearchInput}`}
             type="search"
             placeholder="Поиск по объекту..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ width: "100%" }}
           />
         </div>
 
@@ -64,6 +64,11 @@ export function ObjectsSidebar() {
             Object.entries(groupedObjects).map(([type, fullNames]) => (
               <details key={type} open className={styles.sidebarTypeGroup}>
                 <summary>
+                  <Icon
+                    name={iconNameForObjectType(type)}
+                    size={14}
+                    className={styles.sidebarTypeIcon}
+                  />
                   {type} ({fullNames.length})
                 </summary>
                 <ul className={styles.sidebarItemList}>

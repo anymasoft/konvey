@@ -17,19 +17,22 @@
 }
 
 .burger {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   cursor: pointer;
   border-radius: var(--k-radius);
   color: var(--k-text-2);
-  font-size: 18px;
+  background: transparent;
+  border: none;
   user-select: none;
+  transition: background 100ms ease;
 }
 
 .burger:hover {
   background: var(--k-panel-sunk);
+  color: var(--k-text);
 }
 
 .logo {
@@ -63,7 +66,17 @@
 
 .headerActions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+}
+
+.headerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.headerBtn svg {
+  flex-shrink: 0;
 }
 
 .body {
@@ -94,6 +107,9 @@
   cursor: pointer;
   color: var(--k-text-2);
   font-family: var(--k-font-sans);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .dockTab:hover {
@@ -138,6 +154,21 @@
 .sidebarSearch {
   padding: 8px;
   border-bottom: 1px solid var(--k-divider);
+  position: relative;
+}
+
+.sidebarSearchInput {
+  width: 100%;
+  padding-left: 30px;
+}
+
+.sidebarSearchIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--k-text-3);
+  pointer-events: none;
 }
 
 .sidebarBody {
@@ -159,6 +190,14 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--k-text-2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebarTypeIcon {
+  color: var(--k-text-3);
+  flex-shrink: 0;
 }
 
 .sidebarItemList {

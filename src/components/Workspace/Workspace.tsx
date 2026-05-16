@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { useAppStore } from "@/stores/appStore";
 import { useProjectStore } from "@/stores/projectStore";
+import { Icon, type IconName } from "@/components/icons";
 import { ObjectsSidebar } from "./ObjectsSidebar";
 import { MappingArea } from "./MappingArea";
 import { Inspector } from "./Inspector";
@@ -16,11 +17,11 @@ import styles from "./Workspace.module.css";
 
 type DockTab = "problems" | "xml" | "ai" | "history";
 
-const DOCK_TAB_DEFINITIONS: Array<{ key: DockTab; label: string; sprint: string }> = [
-  { key: "problems", label: "Problems", sprint: "Sprint 2" },
-  { key: "xml", label: "Generated XML", sprint: "Sprint 3" },
-  { key: "ai", label: "AI Chat", sprint: "Sprint 2" },
-  { key: "history", label: "History", sprint: "Sprint 4+" },
+const DOCK_TAB_DEFINITIONS: Array<{ key: DockTab; label: string; icon: IconName }> = [
+  { key: "problems", label: "Problems", icon: "warning" },
+  { key: "xml", label: "Generated XML", icon: "document" },
+  { key: "ai", label: "AI Chat", icon: "info" },
+  { key: "history", label: "History", icon: "refresh" },
 ];
 
 export function Workspace() {
@@ -33,13 +34,14 @@ export function Workspace() {
   return (
     <div className={styles.root}>
       <header className={styles.header}>
-        <div
+        <button
           className={styles.burger}
           onClick={closeProject}
           title="К списку проектов"
+          aria-label="К списку проектов"
         >
-          ≡
-        </div>
+          <Icon name="menu" size={16} />
+        </button>
         <div className={styles.logo}>Konvey</div>
         <div className={styles.divider}>·</div>
         <div className={styles.projectName}>{project.name}</div>
@@ -48,13 +50,16 @@ export function Workspace() {
           EnterpriseData {project.enterprise_data.version}
         </div>
         <div className={styles.headerActions}>
-          <button className="k-btn" disabled title="Доступно после Sprint 2">
+          <button className={`k-btn ${styles.headerBtn}`} disabled title="Доступно после Sprint 2">
+            <Icon name="validate" size={14} />
             Validate
           </button>
-          <button className="k-btn" disabled title="Доступно после Sprint 3">
+          <button className={`k-btn ${styles.headerBtn}`} disabled title="Доступно после Sprint 3">
+            <Icon name="preview" size={14} />
             Preview
           </button>
-          <button className="k-btn" disabled title="Доступно после Sprint 3">
+          <button className={`k-btn ${styles.headerBtn}`} disabled title="Доступно после Sprint 3">
+            <Icon name="export" size={14} />
             Export
           </button>
         </div>
@@ -68,12 +73,13 @@ export function Workspace() {
 
       <div className={styles.bottomDock}>
         <div className={styles.dockTabs}>
-          {DOCK_TAB_DEFINITIONS.map(({ key, label }) => (
+          {DOCK_TAB_DEFINITIONS.map(({ key, label, icon }) => (
             <button
               key={key}
               onClick={() => setDockTab(dockTab === key ? null : key)}
               className={`${styles.dockTab} ${dockTab === key ? styles.dockTabActive : ""}`}
             >
+              <Icon name={icon} size={12} />
               {label}
             </button>
           ))}
