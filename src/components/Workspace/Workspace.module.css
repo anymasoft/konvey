@@ -301,11 +301,16 @@
   font-size: 11px;
 }
 
-/* === TreeView (used inside MappingArea panes) === */
+/* === TreeView (used inside MappingArea panes) ===
+ * Note: leaf nodes use flex-wrap to keep BOTH name and type visible regardless
+ * of column width. When the column is narrow, the type (hint) wraps to the
+ * next line under the name instead of getting cut off with ellipsis.
+ */
 .treeNode {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
   padding: 2px 4px;
   font-size: 12px;
   border-radius: var(--k-radius-sm);
@@ -317,24 +322,88 @@
 }
 
 .treeNodeName {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* No ellipsis - full name always visible; wraps if needed. */
+  word-break: break-word;
 }
 
 .treeNodeHint {
   font-family: var(--k-font-mono);
   font-size: 11px;
   color: var(--k-text-3);
-  flex-shrink: 0;
 }
 
 .treeLeaf {
-  padding-left: 16px;
+  padding: 2px 4px 2px 16px;
   font-size: 12px;
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  border-radius: var(--k-radius-sm);
+}
+
+.treeLeaf:hover {
+  background: var(--k-panel-sunk);
+}
+
+/* === Column resizers between MappingArea panes === */
+.paneResizer {
+  width: 4px;
+  cursor: col-resize;
+  background: var(--k-border);
+  flex-shrink: 0;
+  transition: background 100ms ease;
+}
+
+.paneResizer:hover {
+  background: var(--k-accent);
+}
+
+.paneResizerActive {
+  background: var(--k-accent);
+}
+
+/* When user is dragging a column edge, prevent text selection across the app */
+.bodyDragging {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
+.bodyDragging * {
+  user-select: none !important;
+}
+
+/* === Candidate types list (shown when ED auto-match fails) === */
+.candidateList {
+  margin-top: 8px;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+  border-top: 1px solid var(--k-divider);
+  padding-top: 8px;
+}
+
+.candidateGroupHeader {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--k-text-2);
+  padding: 6px 4px 2px 4px;
+}
+
+.candidateItem {
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: var(--k-radius-sm);
+  color: var(--k-text);
+}
+
+.candidateItem:hover {
+  background: var(--k-panel-sunk);
+}
+
+.candidateItemSelected {
+  background: var(--k-accent-50);
+  color: var(--k-accent-text);
 }
