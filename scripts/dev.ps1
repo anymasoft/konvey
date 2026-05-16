@@ -30,7 +30,10 @@ if (-not (Test-Path $VenvPython)) {
     Pop-Location
 }
 
-# Step 3: Tell sidecar.rs to use dev mode
+# Step 3: Ensure sidecar placeholder exists (so Tauri build doesn't fail)
+. "$PSScriptRoot\ensure-sidecar-placeholder.ps1"
+
+# Step 4: Tell sidecar.rs to use dev mode
 $env:KONVEY_SIDECAR_MODE = "dev"
 $env:KONVEY_SIDECAR_PYTHON = $VenvPython
 
